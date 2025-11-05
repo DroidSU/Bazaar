@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "27324047757",
+    "project_id": "bazaar-d107d",
+    "storage_bucket": "bazaar-d107d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27324047757:android:7b7f0923a813038a3b1dc4",
+        "android_client_info": {
+          "package_name": "com.bazaar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI7p-UD37MnW0VItui2q9pLklWzPGB6lI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
