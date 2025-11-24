@@ -41,7 +41,7 @@ class AddProductViewModel(private val repository: ProductRepository) : ViewModel
 
         isSaving = true
         viewModelScope.launch {
-            val product = Product(name = name, quantity = quantity, price = price)
+            val product = Product(name = name, quantity = quantity, price = price, createdOn = System.currentTimeMillis())
             val result = repository.addProducts(product)
             result.onSuccess {
                 onSuccess

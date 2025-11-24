@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,14 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bazaar.repository.ProductRepositoryImpl
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.NeumorphicTextField
+import com.bazaar.ui.components.QuantitySelector
 import com.bazaar.vm.AddProductViewModel
 import com.bazaar.vm.ViewModelFactory
 
@@ -49,7 +53,13 @@ class AddProductActivity : ComponentActivity() {
         setContent {
             BazaarTheme {
                 AddProductScreen(
-                    viewModel = viewModel,
+                    productName = viewModel.productName,
+                    productPrice = viewModel.productPrice,
+                    productQuantity = viewModel.productQuantity,
+                    isSaving = viewModel.isSaving,
+                    onNameChange = viewModel::onNameChange,
+                    onQuantityChange = viewModel::onQuantityChange,
+                    onPriceChange = viewModel::onPriceChange,
                     onSave = {
                         viewModel.saveProduct(
                             onSuccess = {
@@ -68,79 +78,136 @@ class AddProductActivity : ComponentActivity() {
 }
 
 @Composable
-private fun AddProductScreen(viewModel: AddProductViewModel, onSave: () -> Unit) {
+private fun AddProductScreen(
+    productName: String,
+    productQuantity: String,
+    productPrice: String,
+    isSaving: Boolean,
+    onNameChange: (String) -> Unit,
+    onQuantityChange: (String) -> Unit,
+    onPriceChange: (String) -> Unit,
+    onSave: () -> Unit
+) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .imePadding()
+            .background(MaterialTheme.colorScheme.background)
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 24.dp)
-                .background(MaterialTheme.colorScheme.background),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(rememberScrollState())
+                .imePadding(),
+            horizontalAlignment = Alignment.CenterHorizontally // Center children horizontally
         ) {
-
+            // Header
             Text(
                 text = "Add New Product",
-                fontSize = 28.sp,
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(vertical = 40.dp)
+                modifier = Modifier
+                    .fillMaxWidth() // Allow text to take full width for padding
+                    .padding(
+                        top = 32.dp,
+                        bottom = 32.dp,
+                        start = 20.dp,
+                        end = 20.dp
+                    )
             )
 
-            NeumorphicTextField(
-                value = viewModel.productName,
-                onValueChange = viewModel::onNameChange,
-                placeholder = "Product Name"
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            NeumorphicTextField(
-                value = viewModel.productQuantity,
-                onValueChange = viewModel::onQuantityChange,
-                placeholder = "Quantity",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            NeumorphicTextField(
-                value = viewModel.productPrice,
-                onValueChange = viewModel::onPriceChange,
-                placeholder = "Price",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
+            Column(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp) // Space between label and field
+            ) {
+                // Product Name Field
+                Text(
+                    text = "Product Name",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                NeumorphicTextField(
+                    value = productName,
+                    onValueChange = onNameChange,
+                    placeholder = "e.g., Wireless Headphones",
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    )
+                )
 
-            Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(16.dp))
 
+                // Quantity Field
+                Text(
+                    text = "Quantity",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                QuantitySelector(
+                    quantity = productQuantity,
+                    onQuantityChange = onQuantityChange
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Price Field
+                Text(
+                    text = "Price",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                NeumorphicTextField(
+                    value = productPrice,
+                    onValueChange = onPriceChange,
+                    placeholder = "e.g., 99.99",
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done
+                    )
+                )
+            }
+
+
+            Spacer(modifier = Modifier.weight(1f, fill = true))
+
+            // Save Button
             Button(
                 onClick = onSave,
-                enabled = !viewModel.isSaving,
+                enabled = !isSaving,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .padding(vertical = 32.dp) // Keep vertical padding
+                    .width(200.dp) // Make the button smaller
                     .height(56.dp)
                     .shadow(
-                        elevation = 8.dp,
+                        elevation = 12.dp, // Increase elevation for a more pronounced shadow
                         shape = RoundedCornerShape(28.dp),
-                        ambientColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                        spotColor = MaterialTheme.colorScheme.secondary
+                        spotColor = MaterialTheme.colorScheme.secondary,
+                        ambientColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                     ),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                if (viewModel.isSaving) {
+                if (isSaving) {
                     CircularProgressIndicator(
                         modifier = Modifier.height(24.dp),
                         color = MaterialTheme.colorScheme.onSecondary,
                         strokeWidth = 3.dp
                     )
                 } else {
-                    Text("Save Product", fontSize = 18.sp, color = MaterialTheme.colorScheme.onSecondary)
+                    Text(
+                        "Save Product",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -150,6 +217,13 @@ private fun AddProductScreen(viewModel: AddProductViewModel, onSave: () -> Unit)
 @Composable
 private fun AddProductScreenPreview() {
     BazaarTheme {
-        AddProductScreen(viewModel = AddProductViewModel(ProductRepositoryImpl()), onSave = {})
+        AddProductScreen(
+            productName = "Sample Product",
+            productQuantity = "10",
+            productPrice = "9.99",
+            isSaving = false,
+            onNameChange = {},
+            onQuantityChange = {},
+            onPriceChange = {}, onSave = {})
     }
 }

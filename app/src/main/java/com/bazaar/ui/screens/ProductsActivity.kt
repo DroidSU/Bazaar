@@ -1,10 +1,14 @@
 package com.bazaar.ui.screens
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -27,10 +31,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +65,7 @@ import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.ProductListItem
 import com.bazaar.vm.ProductsActivityViewModel
 import com.bazaar.vm.ViewModelFactory
+import java.util.Locale
 
 class ProductsActivity : ComponentActivity() {
 
@@ -92,8 +100,37 @@ private fun ProductScreen(
     onQueryChange: (String) -> Unit,
     onAddProduct: () -> Unit
 ) {
+    // ---- Voice Search Logic ----
+    val context = LocalContext.current
+    val voiceSearchLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val spokenText: String? =
+                data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.let { results ->
+                    results[0]
+                }
+            if (!spokenText.isNullOrEmpty()) {
+                onQueryChange(spokenText)
+            }
+        }
+    }
+
+    val onVoiceSearchClick: () -> Unit = {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to search...")
+        }
+        voiceSearchLauncher.launch(intent)
+    }
+    // ----------------------------
+
     Scaffold(
-        // Use systemBarsPadding to handle insets automatically
         modifier = Modifier.systemBarsPadding(),
         floatingActionButton = {
             FloatingActionButton(
@@ -109,10 +146,9 @@ private fun ProductScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Use padding from Scaffold
+                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            // Header and Search Bar Section
             Text(
                 text = "Bazaar",
                 style = MaterialTheme.typography.headlineLarge,
@@ -124,29 +160,25 @@ private fun ProductScreen(
             SearchBar(
                 query = searchQuery,
                 onQueryChange = onQueryChange,
+                onVoiceSearchClick = onVoiceSearchClick, // Pass the callback
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Content Section
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 when (uiState) {
-                    is ProductsUiState.Loading -> {
-                        CircularProgressIndicator()
-                    }
-
+                    is ProductsUiState.Loading -> CircularProgressIndicator()
                     is ProductsUiState.Success -> {
                         if (uiState.products.isEmpty()) {
-                            // Show empty state for no results or no initial products
                             EmptyState(isSearch = searchQuery.isNotEmpty())
                         } else {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(bottom = 80.dp) // Padding for FAB
+                                contentPadding = PaddingValues(bottom = 80.dp)
                             ) {
                                 items(items = uiState.products, key = { it.id }) { product ->
                                     ProductListItem(product)
@@ -154,7 +186,6 @@ private fun ProductScreen(
                             }
                         }
                     }
-
                     is ProductsUiState.Error -> {
                         Text(
                             text = uiState.message,
@@ -173,6 +204,7 @@ private fun ProductScreen(
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
+    onVoiceSearchClick: () -> Unit, // New callback for voice icon
     modifier: Modifier = Modifier
 ) {
     TextField(
@@ -180,6 +212,15 @@ fun SearchBar(
         onValueChange = onQueryChange,
         placeholder = { Text("Search products...") },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+        trailingIcon = {
+            IconButton(onClick = onVoiceSearchClick) {
+                Icon(
+                    Icons.Default.Mic,
+                    contentDescription = "Voice Search",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
             focusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -240,9 +281,9 @@ private fun ProductScreenPreview() {
         ProductScreen(
             uiState = ProductsUiState.Success(
                 listOf(
-                    Product("01", "Eco-friendly Water Bottle", 150, 25.0),
-                    Product("02", "Wireless Ergonomic Mouse", 75, 89.99),
-                    Product("03", "Organic Green Tea", 200, 12.50)
+                    Product("01", "Eco-friendly Water Bottle", 150, 25.0, System.currentTimeMillis()),
+                    Product("02", "Wireless Ergonomic Mouse", 75, 89.99, System.currentTimeMillis()),
+                    Product("03", "Organic Green Tea", 200, 12.50, System.currentTimeMillis())
                 )
             ),
             onAddProduct = {},

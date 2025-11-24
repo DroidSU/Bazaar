@@ -7,6 +7,7 @@ import com.bazaar.repository.ProductRepository
 import com.bazaar.repository.ProductsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class ProductsActivityViewModel(private val repository: ProductRepository) : ViewModel() {
@@ -20,19 +21,22 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
     private var originalProducts = listOf<Product>()
 
     init {
-        fetchProducts()
+        collectProducts()
     }
 
-    private fun fetchProducts() {
+    private fun collectProducts() {
         viewModelScope.launch {
-            _uiState.value = ProductsUiState.Loading
             repository.getProducts()
-                .onSuccess { products ->
-                    originalProducts = products
-                    filterProducts()
+                .catch { exception ->
+                    _uiState.value = ProductsUiState.Error(exception.message ?: "An unknown error occurred")
                 }
-                .onFailure {
-                    _uiState.value = ProductsUiState.Error(it.message ?: "An unknown error occurred")
+                .collect { result ->
+                    result.onSuccess { products ->
+                        originalProducts = products
+                        filterProducts() // Filter the new list
+                    }.onFailure {
+                        _uiState.value = ProductsUiState.Error(it.message ?: "An unknown error occurred")
+                    }
                 }
         }
     }

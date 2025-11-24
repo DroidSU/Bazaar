@@ -1,21 +1,33 @@
 package com.bazaar.repository
 
 import com.bazaar.models.Product
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class ProductRepositoryImpl : ProductRepository {
 
-    private val db = Firebase.firestore
+    private val db = FirebaseFirestore.getInstance()
 
-    override suspend fun getProducts(): Result<List<Product>> {
-        return try {
-            val result = db.collection("products").get().await()
-            val products = result.toObjects(Product::class.java)
-            Result.success(products)
-        } catch (e: Exception) {
-            Result.failure(e)
+    override suspend fun getProducts(): Flow<Result<List<Product>>> = callbackFlow {
+        val snapshotListener = db.collection("products")
+            .orderBy("createdOn", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Result.failure(error))
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val products = snapshot.toObjects(Product::class.java)
+                    trySend(Result.success(products))
+                }
+            }
+
+        awaitClose {
+            snapshotListener.remove()
         }
     }
 

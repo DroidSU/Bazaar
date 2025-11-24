@@ -100,7 +100,13 @@ fun ProductListItem(product: Product) {
 @Composable
 private fun ProductListItemPreview() {
     val product =
-        Product(id = "0", name = "Premium Wireless Headphones", quantity = 15, price = 249.99)
+        Product(
+            id = "0",
+            name = "Premium Wireless Headphones",
+            quantity = 15,
+            price = 249.99,
+            createdOn = System.currentTimeMillis()
+        )
     BazaarTheme {
         ProductListItem(product)
     }

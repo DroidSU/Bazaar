@@ -54,6 +54,8 @@ dependencies {
     implementation("com.google.firebase:firebase-storage-ktx")
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation(libs.lottie.compose)
+    implementation(libs.androidx.material.icons.extended)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
