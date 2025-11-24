@@ -2,10 +2,11 @@ package com.bazaar.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PrimaryGreen = Color(0xFF4CAF50)
-val SecondaryGreen = Color(0xFF8BC34A)
-val White = Color(0xFFFFFFFF)
-
-val PrimaryGreenDark = Color(0xFF4CAF50)
-val SecondaryGreenDark = Color(0xFF8BC34A)
-val WhiteDark = Color(0xFFFFFFFF)
+val Terracotta = Color(0xFFC78D6A)
+val RichTeal = Color(0xFF2A9D8F)
+val WarmBackground = Color(0xFFF4F1EE)
+val WarmSurface = Color(0xFFFAF7F5)
+val DarkBrownText = Color(0xFF3A342F)
+val MutedText = Color(0xFF8F8881)
+val PureWhite = Color(0xFFFFFFFF)
+val MaterialError = Color(0xFFB00020)

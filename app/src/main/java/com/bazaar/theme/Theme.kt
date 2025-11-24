@@ -8,35 +8,43 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryGreenDark,
-    secondary = SecondaryGreenDark,
-    tertiary = WhiteDark
+// Light Color Scheme using the new "Modern Spice Market" palette
+private val LightColorScheme = lightColorScheme(
+    primary = Terracotta,
+    onPrimary = PureWhite,
+    secondary = RichTeal,
+    onSecondary = PureWhite,
+    background = WarmBackground,
+    onBackground = DarkBrownText,
+    surface = WarmSurface,
+    onSurface = DarkBrownText,
+    onSurfaceVariant = MutedText,
+    error = MaterialError,
+    onError = PureWhite
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = PrimaryGreen,
-    secondary = SecondaryGreen,
-    tertiary = White
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// Dark theme
+private val DarkColorScheme = darkColorScheme(
+    primary = Terracotta,
+    onPrimary = PureWhite,
+    secondary = RichTeal,
+    onSecondary = PureWhite,
+    background = Color(0xFF1C1B19),
+    onBackground = WarmBackground,
+    surface = Color(0xFF2A2826),
+    onSurface = WarmBackground,
+    onSurfaceVariant = MutedText,
+    error = MaterialError,
+    onError = PureWhite
 )
 
 @Composable
 fun BazaarTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

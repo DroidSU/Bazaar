@@ -1,10 +1,11 @@
 package com.bazaar.models
 
-import java.io.Serializable
+import com.google.firebase.firestore.PropertyName
 
 data class Product(
-    val productId: String = "",
-    val productName: String = "",
-    val productPrice: Double = 0.0,
-    val productImageUrl: String = ""
-) : Serializable
+    @get:PropertyName("id") @set:PropertyName("id") var id: String = "",
+    @get:PropertyName("name") @set:PropertyName("name") var name: String = "",
+    @get:PropertyName("quantity") @set:PropertyName("quantity") var quantity: Int = 0,
+    @get:PropertyName("price") @set:PropertyName("price") var price: Double = 0.0
+)
+
