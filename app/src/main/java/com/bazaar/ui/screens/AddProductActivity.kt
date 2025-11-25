@@ -34,12 +34,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bazaar.models.WeightUnit
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.NeumorphicTextField
+import com.bazaar.ui.components.PriceField
 import com.bazaar.ui.components.QuantitySelector
+import com.bazaar.ui.components.WeightInput
 import com.bazaar.vm.AddProductViewModel
 import com.bazaar.vm.ViewModelFactory
 
@@ -56,10 +60,14 @@ class AddProductActivity : ComponentActivity() {
                     productName = viewModel.productName,
                     productPrice = viewModel.productPrice,
                     productQuantity = viewModel.productQuantity,
+                    productWeight = viewModel.productWeight,
+                    weightUnit = viewModel.weightUnit,
                     isSaving = viewModel.isSaving,
                     onNameChange = viewModel::onNameChange,
                     onQuantityChange = viewModel::onQuantityChange,
                     onPriceChange = viewModel::onPriceChange,
+                    onWeightChange = viewModel::onWeightChange,
+                    onUnitChange = viewModel::onUnitChange,
                     onSave = {
                         viewModel.saveProduct(
                             onSuccess = {
@@ -77,15 +85,20 @@ class AddProductActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
 private fun AddProductScreen(
     productName: String,
     productQuantity: String,
+    productWeight: String,
+    weightUnit: WeightUnit,
     productPrice: String,
     isSaving: Boolean,
     onNameChange: (String) -> Unit,
     onQuantityChange: (String) -> Unit,
     onPriceChange: (String) -> Unit,
+    onWeightChange: (String) -> Unit,
+    onUnitChange: (WeightUnit) -> Unit,
     onSave: () -> Unit
 ) {
     Scaffold(
@@ -100,16 +113,17 @@ private fun AddProductScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .imePadding(),
-            horizontalAlignment = Alignment.CenterHorizontally // Center children horizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
             Text(
                 text = "Add New Product",
                 style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .fillMaxWidth() // Allow text to take full width for padding
+                    .fillMaxWidth()
                     .padding(
                         top = 32.dp,
                         bottom = 32.dp,
@@ -155,6 +169,23 @@ private fun AddProductScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Weight Field
+                Text(
+                    text = "Weight (Optional)",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                WeightInput(
+                    value = productWeight,
+                    unit = weightUnit,
+                    onValueChange = onWeightChange,
+                    onUnitChange = onUnitChange,
+                    modifier = Modifier.fillMaxWidth() // CHANGE: Removed horizontal padding
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // Price Field
                 Text(
                     text = "Price",
@@ -162,14 +193,10 @@ private fun AddProductScreen(
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                NeumorphicTextField(
+                PriceField(
                     value = productPrice,
                     onValueChange = onPriceChange,
-                    placeholder = "e.g., 99.99",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Done
-                    )
+                    modifier = Modifier.height(56.dp) // CHANGE: Removed padding, standardized height
                 )
             }
 
@@ -181,11 +208,11 @@ private fun AddProductScreen(
                 onClick = onSave,
                 enabled = !isSaving,
                 modifier = Modifier
-                    .padding(vertical = 32.dp) // Keep vertical padding
-                    .width(200.dp) // Make the button smaller
+                    .padding(vertical = 32.dp)
+                    .width(200.dp)
                     .height(56.dp)
                     .shadow(
-                        elevation = 12.dp, // Increase elevation for a more pronounced shadow
+                        elevation = 15.dp,
                         shape = RoundedCornerShape(28.dp),
                         spotColor = MaterialTheme.colorScheme.secondary,
                         ambientColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
@@ -221,9 +248,11 @@ private fun AddProductScreenPreview() {
             productName = "Sample Product",
             productQuantity = "10",
             productPrice = "9.99",
+            productWeight = "1.0",
+            weightUnit = WeightUnit.KG,
             isSaving = false,
             onNameChange = {},
             onQuantityChange = {},
-            onPriceChange = {}, onSave = {})
+            onPriceChange = {}, onSave = {}, onWeightChange = {}, onUnitChange = {})
     }
 }

@@ -11,31 +11,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-// Light Color Scheme using the new "Modern Spice Market" palette
+// Light Color Scheme with a warmer background and more prominent text
 private val LightColorScheme = lightColorScheme(
     primary = Terracotta,
     onPrimary = PureWhite,
     secondary = RichTeal,
     onSecondary = PureWhite,
-    background = WarmBackground,
-    onBackground = DarkBrownText,
+    background = SoftCream,         // Using the new warmer background
+    onBackground = Charcoal,        // Using the new prominent text color
     surface = WarmSurface,
-    onSurface = DarkBrownText,
+    onSurface = Charcoal,           // Using the new prominent text color on surfaces too
     onSurfaceVariant = MutedText,
     error = MaterialError,
     onError = PureWhite
 )
 
-// Dark theme
+// Dark theme with corresponding adjustments
 private val DarkColorScheme = darkColorScheme(
     primary = Terracotta,
     onPrimary = PureWhite,
     secondary = RichTeal,
     onSecondary = PureWhite,
     background = Color(0xFF1C1B19),
-    onBackground = WarmBackground,
+    onBackground = SoftCream.copy(alpha = 0.9f), // Using a light, warm text color for dark mode
     surface = Color(0xFF2A2826),
-    onSurface = WarmBackground,
+    onSurface = SoftCream.copy(alpha = 0.9f),    // Consistent text color on surfaces
     onSurfaceVariant = MutedText,
     error = MaterialError,
     onError = PureWhite

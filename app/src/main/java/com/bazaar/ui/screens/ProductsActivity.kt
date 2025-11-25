@@ -60,8 +60,10 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
 import com.bazaar.models.Product
+import com.bazaar.models.WeightUnit
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
+import com.bazaar.ui.components.EditProductSheet
 import com.bazaar.ui.components.ProductListItem
 import com.bazaar.vm.ProductsActivityViewModel
 import com.bazaar.vm.ViewModelFactory
@@ -78,6 +80,8 @@ class ProductsActivity : ComponentActivity() {
             BazaarTheme {
                 val uiState by viewModel.uiState.collectAsState()
                 val searchQuery by viewModel.searchQuery.collectAsState()
+                val editingProduct by viewModel.editingProduct.collectAsState()
+                val isSavingUpdate by viewModel.isSavingUpdate.collectAsState()
 
                 ProductScreen(
                     uiState = uiState,
@@ -86,7 +90,12 @@ class ProductsActivity : ComponentActivity() {
                     onAddProduct = {
                         val intent = Intent(this, AddProductActivity::class.java)
                         startActivity(intent)
-                    }
+                    },
+                    editingProduct = editingProduct,
+                    isSavingUpdate = isSavingUpdate,
+                    onEditProduct = viewModel::onEditProductClicked,
+                    onDismissEdit = viewModel::onDismissEdit,
+                    onUpdateProduct = viewModel::onUpdateProduct
                 )
             }
         }
@@ -98,7 +107,12 @@ private fun ProductScreen(
     uiState: ProductsUiState,
     searchQuery: String,
     onQueryChange: (String) -> Unit,
-    onAddProduct: () -> Unit
+    onAddProduct: () -> Unit,
+    editingProduct: Product?,
+    isSavingUpdate: Boolean,
+    onEditProduct: (Product) -> Unit,
+    onDismissEdit: () -> Unit,
+    onUpdateProduct: (Product) -> Unit
 ) {
     // ---- Voice Search Logic ----
     val context = LocalContext.current
@@ -128,7 +142,6 @@ private fun ProductScreen(
         }
         voiceSearchLauncher.launch(intent)
     }
-    // ----------------------------
 
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
@@ -181,11 +194,21 @@ private fun ProductScreen(
                                 contentPadding = PaddingValues(bottom = 80.dp)
                             ) {
                                 items(items = uiState.products, key = { it.id }) { product ->
-                                    ProductListItem(product)
+                                    ProductListItem(product, onEditClick = onEditProduct)
                                 }
+                            }
+
+                            if(editingProduct != null){
+                                EditProductSheet(
+                                    product = editingProduct,
+                                    onDismiss = onDismissEdit,
+                                    onSave = onUpdateProduct,
+                                    isSaving = isSavingUpdate
+                                )
                             }
                         }
                     }
+
                     is ProductsUiState.Error -> {
                         Text(
                             text = uiState.message,
@@ -281,14 +304,43 @@ private fun ProductScreenPreview() {
         ProductScreen(
             uiState = ProductsUiState.Success(
                 listOf(
-                    Product("01", "Eco-friendly Water Bottle", 150, 25.0, System.currentTimeMillis()),
-                    Product("02", "Wireless Ergonomic Mouse", 75, 89.99, System.currentTimeMillis()),
-                    Product("03", "Organic Green Tea", 200, 12.50, System.currentTimeMillis())
+                    Product(
+                        "01",
+                        "Eco-friendly Water Bottle",
+                        150,
+                        25.0,
+                        weight = 1.0,
+                        weightUnit = WeightUnit.KG.toString(),
+                        System.currentTimeMillis()
+                    ),
+                    Product(
+                        "02",
+                        "Wireless Ergonomic Mouse",
+                        75,
+                        89.99,
+                        weight = 1.0,
+                        weightUnit = WeightUnit.KG.toString(),
+                        System.currentTimeMillis()
+                    ),
+                    Product(
+                        "03",
+                        "Organic Green Tea",
+                        200,
+                        12.50,
+                        weight = 1.0,
+                        weightUnit = WeightUnit.KG.toString(),
+                        System.currentTimeMillis()
+                    )
                 )
             ),
             onAddProduct = {},
             searchQuery = "",
-            onQueryChange = {}
+            onQueryChange = {},
+            editingProduct = null,
+            isSavingUpdate = false,
+            onEditProduct = {},
+            onDismissEdit = {},
+            onUpdateProduct = {}
         )
     }
 }

@@ -41,4 +41,16 @@ class ProductRepositoryImpl : ProductRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun updateProduct(product: Product): Result<Unit> {
+        return try {
+            if (product.id.isBlank()) {
+                throw IllegalArgumentException("Product ID cannot be empty for an update.")
+            }
+            db.collection("products").document(product.id).set(product).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

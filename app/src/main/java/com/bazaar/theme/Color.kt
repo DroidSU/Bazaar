@@ -10,3 +10,7 @@ val DarkBrownText = Color(0xFF3A342F)
 val MutedText = Color(0xFF8F8881)
 val PureWhite = Color(0xFFFFFFFF)
 val MaterialError = Color(0xFFB00020)
+
+val SoftCream = Color(0xFFFFFAF0)// A warmer, richer background
+val Charcoal = Color(0xFF343434)        // A darker, more prominent text color
+
