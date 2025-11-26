@@ -37,8 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bazaar.models.Product
-import com.bazaar.models.WeightUnit
 import com.bazaar.theme.BazaarTheme
+import com.bazaar.utils.WeightUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

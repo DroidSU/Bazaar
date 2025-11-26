@@ -38,12 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bazaar.models.WeightUnit
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.NeumorphicTextField
 import com.bazaar.ui.components.PriceField
 import com.bazaar.ui.components.QuantitySelector
 import com.bazaar.ui.components.WeightInput
+import com.bazaar.utils.WeightUnit
 import com.bazaar.vm.AddProductViewModel
 import com.bazaar.vm.ViewModelFactory
 

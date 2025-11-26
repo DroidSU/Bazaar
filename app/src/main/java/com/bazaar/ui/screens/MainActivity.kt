@@ -24,6 +24,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
 import com.bazaar.theme.BazaarTheme
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +35,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             BazaarTheme {
                 SplashScreen {
-                    val intent = Intent(this, ProductsActivity::class.java)
+                    val auth = FirebaseAuth.getInstance()
+                    if (auth.currentUser != null) {
+                        val intent = Intent(this, ProductsActivity::class.java)
+                    } else {
+                        val intent = Intent(this, AuthenticationActivity::class.java)
+                    }
+
                     startActivity(intent)
                     finish()
                 }

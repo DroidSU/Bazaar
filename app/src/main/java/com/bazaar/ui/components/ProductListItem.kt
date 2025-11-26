@@ -61,7 +61,7 @@ fun ProductListItem(product: Product, onEditClick: (Product) -> Unit) {
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top, // Align to the top
+                verticalAlignment = Alignment.CenterVertically, // Align to the top
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Product Name

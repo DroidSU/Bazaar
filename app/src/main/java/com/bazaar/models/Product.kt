@@ -1,5 +1,6 @@
 package com.bazaar.models
 
+import com.bazaar.utils.WeightUnit
 import com.google.firebase.firestore.PropertyName
 
 data class Product(

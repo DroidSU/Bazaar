@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bazaar.models.Product
-import com.bazaar.models.WeightUnit
 import com.bazaar.repository.ProductRepository
+import com.bazaar.utils.WeightUnit
 import kotlinx.coroutines.launch
 
 class AddProductViewModel(private val repository: ProductRepository) : ViewModel() {

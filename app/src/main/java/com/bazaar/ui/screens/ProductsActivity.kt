@@ -61,11 +61,11 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
 import com.bazaar.models.Product
-import com.bazaar.models.WeightUnit
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.EditProductSheet
 import com.bazaar.ui.components.ProductListItem
+import com.bazaar.utils.WeightUnit
 import com.bazaar.vm.ProductsActivityViewModel
 import com.bazaar.vm.ViewModelFactory
 import java.util.Locale
