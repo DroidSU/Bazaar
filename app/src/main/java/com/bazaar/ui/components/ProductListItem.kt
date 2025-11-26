@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -72,7 +73,7 @@ fun ProductListItem(product: Product, onEditClick: (Product) -> Unit) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .weight(1f) // Take up available space
+                        .weight(1f)
                         .padding(end = 12.dp) // Add padding to not touch the icon
                 )
                 // Edit Icon Button
@@ -80,7 +81,8 @@ fun ProductListItem(product: Product, onEditClick: (Product) -> Unit) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Product",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -107,10 +109,9 @@ fun ProductListItem(product: Product, onEditClick: (Product) -> Unit) {
                         )
                     }
 
-                    // Weight Information - check if weight is positive
                     if (product.weight > 0) {
                         Text(
-                            text = "Weight: ${product.weight}${product.weightUnit}",
+                            text = "Weight: ${product.weight}${product.weightUnit.lowercase()}",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
