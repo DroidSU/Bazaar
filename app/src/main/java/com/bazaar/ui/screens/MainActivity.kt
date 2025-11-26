@@ -36,13 +36,12 @@ class MainActivity : ComponentActivity() {
             BazaarTheme {
                 SplashScreen {
                     val auth = FirebaseAuth.getInstance()
-                    if (auth.currentUser != null) {
-                        val intent = Intent(this, ProductsActivity::class.java)
+                    val targetActivity = if (auth.currentUser != null) {
+                        ProductsActivity::class.java
                     } else {
-                        val intent = Intent(this, AuthenticationActivity::class.java)
+                        AuthenticationActivity::class.java
                     }
-
-                    startActivity(intent)
+                    startActivity(Intent(this, targetActivity))
                     finish()
                 }
             }
@@ -52,9 +51,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
-    LaunchedEffect(Unit) {
-        delay(2000)
-        onTimeout()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.anim_load))
+
+    LaunchedEffect(composition) {
+        if(composition != null){
+            delay(2000)
+            onTimeout()
+        }
     }
 
     Box(
@@ -67,8 +70,6 @@ fun SplashScreen(onTimeout: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Lottie Animation
-            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.anim_load))
             LottieAnimation(
                 composition = composition,
                 iterations = LottieConstants.IterateForever,
