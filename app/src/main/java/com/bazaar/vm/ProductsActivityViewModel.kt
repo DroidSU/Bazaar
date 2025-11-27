@@ -1,15 +1,25 @@
 package com.bazaar.vm
 
+import android.content.ContentResolver
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bazaar.models.Product
+import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductRepository
 import com.bazaar.repository.ProductsUiState
+import com.bazaar.utils.WeightUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.util.UUID
 
 class ProductsActivityViewModel(private val repository: ProductRepository) : ViewModel() {
 
@@ -21,12 +31,17 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
 
     private var originalProducts = listOf<Product>()
 
+    // StateFlow to manage the state of the product being edited.
     private val _editingProduct = MutableStateFlow<Product?>(null)
     val editingProduct: StateFlow<Product?> = _editingProduct.asStateFlow()
 
+    // StateFlow to indicate if an update operation is in progress.
     private val _isSavingUpdate = MutableStateFlow(false)
     val isSavingUpdate: StateFlow<Boolean> = _isSavingUpdate.asStateFlow()
 
+    // StateFlow to manage the state of the CSV upload.
+    private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
+    val uploadState = _uploadState.asStateFlow()
 
     init {
         collectProducts()
@@ -84,9 +99,84 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
                 _isSavingUpdate.value = false
                 onDismissEdit() // Close the sheet on success
             }.onFailure {
-                // Handle error (e.g., show a toast)
                 _isSavingUpdate.value = false
             }
+        }
+    }
+
+    fun onDismissUpload() {
+        _uploadState.value = UploadState.Idle
+    }
+
+    /**
+     * Parses a CSV file from the given Uri, creates Product objects,
+     * and uploads them to the repository.
+     */
+    fun uploadProductsFromCsv(contentResolver: ContentResolver, uri: Uri) {
+        viewModelScope.launch {
+            _uploadState.value = UploadState.Uploading(0)
+            try {
+                val products = parseCsv(contentResolver, uri)
+                if (products.isEmpty()) {
+                    _uploadState.value = UploadState.Error("CSV is empty or invalid.")
+                    return@launch
+                }
+
+                products.forEachIndexed { index, product ->
+                    repository.addProducts(product)
+                    val progress = ((index + 1) * 100 / products.size)
+                    _uploadState.value = UploadState.Uploading(progress)
+                }
+
+                _uploadState.value = UploadState.Success
+                delay(2000) // Show success for 2 seconds before hiding
+                _uploadState.value = UploadState.Idle
+
+            } catch (e: Exception) {
+                _uploadState.value = UploadState.Error(e.message ?: "An unknown error occurred")
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
+     * Parses a CSV file into a list of Product objects.
+     * Handles optional weight and weightUnit columns.
+     * Expects CSV format: name,quantity,price,weight,weightUnit
+     */
+    private suspend fun parseCsv(contentResolver: ContentResolver, uri: Uri): List<Product> {
+        return withContext(Dispatchers.IO) {
+            val products = mutableListOf<Product>()
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    // Skip header line
+                    reader.readLine()
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        val tokens = line!!.split(",")
+                        // Expects 5 columns: name, quantity, price, weight, weightUnit
+                        if (tokens.size >= 3) {
+                            try {
+                                val product = Product(
+                                    id = UUID.randomUUID().toString(),
+                                    name = tokens[0].trim(),
+                                    quantity = tokens.getOrNull(1)?.trim()?.toIntOrNull() ?: 0,
+                                    price = tokens.getOrNull(2)?.trim()?.toDoubleOrNull() ?: 0.0,
+                                    weight = tokens.getOrNull(3)?.trim()?.toDoubleOrNull() ?: 0.0,
+                                    weightUnit = tokens.getOrNull(4)?.trim()?.uppercase()
+                                        .takeIf { !it.isNullOrEmpty() } ?: WeightUnit.KG.toString(),
+                                    createdOn = System.currentTimeMillis()
+                                )
+                                products.add(product)
+                            } catch (e: NumberFormatException) {
+                                // Ignore lines with invalid numbers
+                                println("Skipping invalid line: $line")
+                            }
+                        }
+                    }
+                }
+            }
+            products
         }
     }
 

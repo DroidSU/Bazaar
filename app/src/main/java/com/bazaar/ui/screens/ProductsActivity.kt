@@ -2,12 +2,12 @@ package com.bazaar.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
@@ -32,10 +32,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,22 +50,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
 import com.bazaar.models.Product
+import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.EditProductSheet
+import com.bazaar.ui.components.FabAction
+import com.bazaar.ui.components.MultiFloatingButton
 import com.bazaar.ui.components.ProductListItem
+import com.bazaar.ui.components.UploadProgressIndicator
 import com.bazaar.utils.WeightUnit
 import com.bazaar.vm.ProductsActivityViewModel
 import com.bazaar.vm.ViewModelFactory
@@ -76,27 +81,32 @@ class ProductsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             BazaarTheme {
-                val uiState by viewModel.uiState.collectAsState()
+                val uiState by viewModel.uiState.collectAsState(initial = ProductsUiState.Loading)
                 val searchQuery by viewModel.searchQuery.collectAsState()
                 val editingProduct by viewModel.editingProduct.collectAsState()
                 val isSavingUpdate by viewModel.isSavingUpdate.collectAsState()
+                val uploadState by viewModel.uploadState.collectAsState()
 
                 ProductScreen(
                     uiState = uiState,
                     searchQuery = searchQuery,
+                    uploadState = uploadState,
                     onQueryChange = viewModel::onSearchQueryChanged,
                     onAddProduct = {
-                        val intent = Intent(this, AddProductActivity::class.java)
-                        startActivity(intent)
+                        // Your navigation logic to AddProductActivity
                     },
                     editingProduct = editingProduct,
                     isSavingUpdate = isSavingUpdate,
                     onEditProduct = viewModel::onEditProductClicked,
                     onDismissEdit = viewModel::onDismissEdit,
-                    onUpdateProduct = viewModel::onUpdateProduct
+                    onUpdateProduct = viewModel::onUpdateProduct,
+                    onUploadCsv = { uri ->
+                        viewModel.uploadProductsFromCsv(contentResolver, uri)
+                    },
+                    onDismissUpload = viewModel::onDismissUpload
                 )
             }
         }
@@ -108,16 +118,25 @@ class ProductsActivity : ComponentActivity() {
 private fun ProductScreen(
     uiState: ProductsUiState,
     searchQuery: String,
+    uploadState: UploadState,
     onQueryChange: (String) -> Unit,
     onAddProduct: () -> Unit,
     editingProduct: Product?,
     isSavingUpdate: Boolean,
     onEditProduct: (Product) -> Unit,
     onDismissEdit: () -> Unit,
-    onUpdateProduct: (Product) -> Unit
+    onUpdateProduct: (Product) -> Unit,
+    onUploadCsv: (Uri) -> Unit,
+    onDismissUpload: () -> Unit
 ) {
+    // ---- CSV Picker Logic ----
+    val csvPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let(onUploadCsv)
+    }
+
     // ---- Voice Search Logic ----
-    val context = LocalContext.current
     val voiceSearchLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -148,79 +167,107 @@ private fun ProductScreen(
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddProduct,
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary,
-                shape = MaterialTheme.shapes.large
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Product")
-            }
+            MultiFloatingButton(
+                modifier = Modifier.padding(bottom = 8.dp),
+                mainIcon = Icons.Default.MoreVert,
+                actions = listOf(
+                    FabAction(
+                        icon = Icons.Default.UploadFile,
+                        description = "Upload excel",
+                        onClick = {
+                            // Launch the document picker here
+                            // Pass array of accepted MIME types
+                            csvPickerLauncher.launch(
+                                arrayOf(
+                                    "text/csv",
+                                    "text/comma-separated-values",
+                                    "application/csv",
+                                )
+                            )
+                        }
+                    ),
+                    FabAction(
+                        icon = Icons.Default.Add,
+                        description = "Add new product",
+                        onClick = onAddProduct
+                    )
+                )
+            )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Text(
-                text = "Bazaar",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-            )
-
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = onQueryChange,
-                onVoiceSearchClick = onVoiceSearchClick, // Pass the callback
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
-                when (uiState) {
-                    is ProductsUiState.Loading -> CircularProgressIndicator()
-                    is ProductsUiState.Success -> {
-                        if (uiState.products.isEmpty()) {
-                            EmptyState(isSearch = searchQuery.isNotEmpty())
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(bottom = 80.dp)
-                            ) {
-                                items(items = uiState.products, key = { it.id }) { product ->
-                                    ProductListItem(product, onEditClick = onEditProduct)
+                Text(
+                    text = "Bazaar",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+                )
+
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = onQueryChange,
+                    onVoiceSearchClick = onVoiceSearchClick,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when (uiState) {
+                        is ProductsUiState.Loading -> CircularProgressIndicator()
+                        is ProductsUiState.Success -> {
+                            if (uiState.products.isEmpty()) {
+                                EmptyState(isSearch = searchQuery.isNotEmpty())
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(bottom = 80.dp)
+                                ) {
+                                    items(items = uiState.products, key = { it.id }) { product ->
+                                        ProductListItem(product, onEditClick = onEditProduct)
+                                    }
+                                }
+
+                                if (editingProduct != null) {
+                                    EditProductSheet(
+                                        product = editingProduct,
+                                        onDismiss = onDismissEdit,
+                                        onSave = onUpdateProduct,
+                                        isSaving = isSavingUpdate
+                                    )
                                 }
                             }
-
-                            if(editingProduct != null){
-                                EditProductSheet(
-                                    product = editingProduct,
-                                    onDismiss = onDismissEdit,
-                                    onSave = onUpdateProduct,
-                                    isSaving = isSavingUpdate
-                                )
-                            }
                         }
-                    }
 
-                    is ProductsUiState.Error -> {
-                        Text(
-                            text = uiState.message,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(16.dp)
-                        )
+                        is ProductsUiState.Error -> {
+                            Text(
+                                text = uiState.message,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
             }
+            // --- Upload Progress Indicator ---
+            UploadProgressIndicator(
+                uploadState = uploadState,
+                onDismiss = onDismissUpload,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            )
         }
     }
 }
@@ -229,7 +276,7 @@ private fun ProductScreen(
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    onVoiceSearchClick: () -> Unit, // New callback for voice icon
+    onVoiceSearchClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TextField(
@@ -307,42 +354,27 @@ private fun ProductScreenPreview() {
             uiState = ProductsUiState.Success(
                 listOf(
                     Product(
-                        "01",
-                        "Eco-friendly Water Bottle",
-                        150,
-                        25.0,
+                        id = "01",
+                        name = "Sample Product",
+                        quantity = 10,
+                        price = 99.99,
                         weight = 1.0,
                         weightUnit = WeightUnit.KG.toString(),
-                        System.currentTimeMillis()
-                    ),
-                    Product(
-                        "02",
-                        "Wireless Ergonomic Mouse",
-                        75,
-                        89.99,
-                        weight = 1.0,
-                        weightUnit = WeightUnit.KG.toString(),
-                        System.currentTimeMillis()
-                    ),
-                    Product(
-                        "03",
-                        "Organic Green Tea",
-                        200,
-                        12.50,
-                        weight = 1.0,
-                        weightUnit = WeightUnit.KG.toString(),
-                        System.currentTimeMillis()
+                        createdOn = System.currentTimeMillis()
                     )
                 )
             ),
-            onAddProduct = {},
             searchQuery = "",
+            uploadState = UploadState.Uploading(50),
             onQueryChange = {},
+            onAddProduct = {},
             editingProduct = null,
             isSavingUpdate = false,
             onEditProduct = {},
             onDismissEdit = {},
-            onUpdateProduct = {}
+            onUpdateProduct = {},
+            onUploadCsv = {},
+            onDismissUpload = {}
         )
     }
 }

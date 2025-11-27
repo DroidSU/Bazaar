@@ -105,7 +105,7 @@ private fun AddProductScreen(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background),
     ) { innerPadding ->
         Column(
             modifier = Modifier
