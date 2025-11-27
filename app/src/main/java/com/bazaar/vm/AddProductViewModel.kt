@@ -68,7 +68,7 @@ class AddProductViewModel(private val repository: ProductRepository) : ViewModel
                 val product = Product(name = name, quantity = quantity!!, price = price!!, createdOn = System.currentTimeMillis())
                 val result = repository.addProducts(product)
                 result.onSuccess {
-                    onSuccess
+                    onSuccess()
                 }.onFailure {
                     onError(it.message ?: "An unknown error occurred.")
                 }

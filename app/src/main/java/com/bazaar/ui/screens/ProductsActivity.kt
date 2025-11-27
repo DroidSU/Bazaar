@@ -96,7 +96,7 @@ class ProductsActivity : ComponentActivity() {
                     uploadState = uploadState,
                     onQueryChange = viewModel::onSearchQueryChanged,
                     onAddProduct = {
-                        // Your navigation logic to AddProductActivity
+                        startActivity(Intent(this, AddProductActivity::class.java))
                     },
                     editingProduct = editingProduct,
                     isSavingUpdate = isSavingUpdate,
