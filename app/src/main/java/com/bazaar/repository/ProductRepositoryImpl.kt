@@ -70,4 +70,13 @@ class ProductRepositoryImpl : ProductRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun signOut(): Result<Unit> {
+        return try {
+            auth.signOut()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

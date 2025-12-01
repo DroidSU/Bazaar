@@ -45,9 +45,9 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
 import com.bazaar.models.AuthUiState
+import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.LoginOptionsView
 import com.bazaar.ui.components.OtpEntryView
-import com.bazaar.ui.screens.ui.theme.BazaarTheme
 import com.bazaar.vm.AuthViewModel
 import com.bazaar.vm.ViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn

@@ -43,6 +43,9 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
     val uploadState = _uploadState.asStateFlow()
 
+    private val _isSignedOut = MutableStateFlow(false)
+    val isSignedOut = _isSignedOut.asStateFlow()
+
     init {
         collectProducts()
     }
@@ -56,8 +59,8 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
                 }
                 .collect { result ->
                     result.onSuccess { products ->
-                        originalProducts = products
-                        filterProducts() // Filter the new list
+                        originalProducts = products.filter { !it.isDeleted }
+                        filterProducts()
                     }.onFailure {
                         _uiState.value =
                             ProductsUiState.Error(it.message ?: "An unknown error occurred")
@@ -180,4 +183,21 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
         }
     }
 
+    fun signOut() {
+        viewModelScope.launch {
+            val result = repository.signOut()
+            if(result.isSuccess) {
+                _isSignedOut.value = true
+            }
+        }
+    }
+
+    /**
+     * This method handles deletion of an item by setting its isDeleted flag to true
+     */
+    fun onDeleteProduct(product: Product) {
+        viewModelScope.launch {
+            repository.updateProduct(product.copy(isDeleted = true))
+        }
+    }
 }

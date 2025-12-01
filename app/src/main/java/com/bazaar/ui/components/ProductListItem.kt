@@ -6,23 +6,29 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,74 +39,152 @@ import com.bazaar.theme.BazaarTheme
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductListItem(product: Product, onEditClick: (Product) -> Unit) {
+fun ProductListItem(
+    product: Product,
+    onEditClick: (Product) -> Unit,
+    onDelete: (Product) -> Unit,
+    onSwipeLeft: (Product) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = {
+            when (it) {
+                SwipeToDismissBoxValue.EndToStart -> { // Swipe Right to Left (Delete)
+                    onDelete(product.apply { isDeleted = true })
+                    true // Returning true allows the dismiss animation to complete.
+                }
+                SwipeToDismissBoxValue.StartToEnd -> { // Swipe Left to Right
+                    onSwipeLeft(product)
+                    false // Return false to snap back to the original position.
+                }
+                SwipeToDismissBoxValue.Settled -> false
+            }
+        },
+        positionalThreshold = { totalDistance -> totalDistance * 0.90f }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        modifier = modifier.padding(vertical = 5.dp, horizontal = 8.dp),
+        enableDismissFromStartToEnd = false, // Enables left-to-right swipe
+        enableDismissFromEndToStart = true,  // Enables right-to-left swipe
+        backgroundContent = {
+
+//            val color by animateColorAsState(
+//                targetValue = when (dismissState.targetValue) {
+//                    SwipeToDismissBoxValue.EndToStart -> Color(0xFFD32F2F) // A more distinct red for delete
+//                    SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
+//                    SwipeToDismissBoxValue.Settled -> Color.Transparent
+//                },
+//                animationSpec = tween(300),
+//                label = "background color"
+//            )
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(horizontal = 24.dp),
+            ) {
+                // We determine the icon and its alignment based on the targetValue.
+                // It's crucial to handle both directions within the same composable block
+                // to ensure Compose updates it correctly during the swipe.
+//                if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
+//                    Icon(
+//                        Icons.Default.Delete,
+//                        contentDescription = "Delete Icon",
+//                        tint = Color.White,
+//                        modifier = Modifier.align(Alignment.CenterEnd) // Align icon to the end
+//                    )
+//                } else if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) {
+//                    Icon(
+//                        Icons.Default.Archive, // Changed to a different dummy icon
+//                        contentDescription = "Left Swipe Action",
+//                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+//                        modifier = Modifier.align(Alignment.CenterStart) // Align icon to the start
+//                    )
+//                }
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete Icon",
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.align(Alignment.CenterEnd).size(28.dp) // Align icon to the end
+                )
+            }
+        }
+    ) {
+        // Encapsulated the item content in a Card for better aesthetics
+        ProductContent(product = product, onEditClick = onEditClick)
+    }
+}
+
+
+@Composable
+fun ProductContent(product: Product, onEditClick: (Product) -> Unit) {
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 6.dp)
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-            )
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.White.copy(alpha = 0.8f)
-            )
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+    // Using Card for elevation, shadow, and a contained look
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp,
+            pressedElevation = 8.dp,
+            draggedElevation = 10.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        )
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
+            // Top Row: Product Name and Edit Button
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically, // Align to the top
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Product Name
                 Text(
                     text = product.name,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 12.dp) // Add padding to not touch the icon
+                        .padding(end = 12.dp)
                 )
-                // Edit Icon Button
-                IconButton(onClick = { onEditClick(product) }) {
+                IconButton(
+                    onClick = { onEditClick(product) },
+                    modifier = Modifier.size(24.dp) // Compact IconButton
+                ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Product",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // --- MODIFIED SECTION: Quantity, Weight, and Price ---
+            // Bottom Row: Details and Price
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Group Quantity and Weight together
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Quantity Information
+                // Details Column: Grouping Quantity and Weight vertically
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     if (product.quantity > 0) {
                         Text(
                             text = "Qty: ${product.quantity}",
@@ -108,21 +192,19 @@ fun ProductListItem(product: Product, onEditClick: (Product) -> Unit) {
                             fontSize = 14.sp
                         )
                     }
-
                     if (product.weight > 0) {
                         Text(
-                            text = "Weight: ${product.weight}${product.weightUnit.lowercase()}",
+                            text = "Weight: ${product.weight} ${product.weightUnit.lowercase()}",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
                     }
                 }
-
-                // Price Information
+                // Price, aligned to the end
                 Text(
                     text = currencyFormat.format(product.price),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.secondary
                 )
             }
@@ -131,13 +213,13 @@ fun ProductListItem(product: Product, onEditClick: (Product) -> Unit) {
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFFF0F0F0)
 @Composable
 private fun ProductListItemPreview() {
     val product =
         Product(
             id = "0",
-            name = "Premium Wireless Headphones with Extra Bass and a Very Long Name",
+            name = "Premium Wireless Headphones with Extra Bass",
             quantity = 15,
             price = 249.99,
             weight = 500.0,
@@ -145,6 +227,13 @@ private fun ProductListItemPreview() {
             createdOn = System.currentTimeMillis()
         )
     BazaarTheme {
-        ProductListItem(product, onEditClick = {})
+        ProductListItem(
+            product = product,
+            onEditClick = {},
+            onDelete = {},
+            onSwipeLeft = {
+                // TODO: Implement left swipe action
+            }
+        )
     }
 }

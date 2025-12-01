@@ -11,6 +11,7 @@ data class Product(
     @get:PropertyName("weight") @set:PropertyName("weight") var weight: Double = 0.0,
     @get:PropertyName("weightUnit") @set:PropertyName("weightUnit") var weightUnit: String = WeightUnit.KG.toString(),
     @get:PropertyName("createdOn") @set:PropertyName("createdOn") var createdOn: Long = 0,
+    @get:PropertyName("isDeleted") @set:PropertyName("isDeleted") var isDeleted: Boolean = false
 )
 
 

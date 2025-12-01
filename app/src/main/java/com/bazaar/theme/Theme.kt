@@ -8,37 +8,54 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-// Light Color Scheme with a warmer background and more prominent text
 private val LightColorScheme = lightColorScheme(
-    primary = Terracotta,
-    onPrimary = PureWhite,
-    secondary = RichTeal,
-    onSecondary = PureWhite,
-    background = SoftCream,         // Using the new warmer background
-    onBackground = Charcoal,        // Using the new prominent text color
-    surface = WarmSurface,
-    onSurface = Charcoal,           // Using the new prominent text color on surfaces too
-    onSurfaceVariant = MutedText,
-    error = MaterialError,
-    onError = PureWhite
+    primary = SageGreen,
+    onPrimary = White,
+    primaryContainer = PaleSage,
+    onPrimaryContainer = DeepForest,
+
+    secondary = WarmAmber,
+    onSecondary = White,
+    secondaryContainer = LightAmber,
+    onSecondaryContainer = DarkAmber,
+
+    error = MutedRed,
+    onError = White,
+    errorContainer = LightPink,
+    onErrorContainer = DarkestRed,
+
+    background = OffWhite,
+    onBackground = DarkCharcoal,
+    surface = LightGray,
+    onSurface = DarkCharcoal,
+    surfaceVariant = LightGray,
+    onSurfaceVariant = MediumGray
 )
 
-// Dark theme with corresponding adjustments
 private val DarkColorScheme = darkColorScheme(
-    primary = Terracotta,
-    onPrimary = PureWhite,
-    secondary = RichTeal,
-    onSecondary = PureWhite,
-    background = Color(0xFF1C1B19),
-    onBackground = SoftCream.copy(alpha = 0.9f), // Using a light, warm text color for dark mode
-    surface = Color(0xFF2A2826),
-    onSurface = SoftCream.copy(alpha = 0.9f),    // Consistent text color on surfaces
-    onSurfaceVariant = MutedText,
-    error = MaterialError,
-    onError = PureWhite
+    primary = SageGreen,
+    onPrimary = White,
+    primaryContainer = DeepForest,
+    onPrimaryContainer = PaleSage,
+
+    secondary = WarmAmber,
+    onSecondary = White,
+    secondaryContainer = DarkAmber,
+    onSecondaryContainer = LightAmber,
+
+    error = MutedRed,
+    onError = White,
+    errorContainer = DarkestRed,
+    onErrorContainer = LightPink,
+
+    background = DarkBackground,
+    onBackground = PaleWhite,
+    surface = DarkSurface,
+    onSurface = PaleWhite,
+    surfaceVariant = DarkSurface,
+    onSurfaceVariant = MediumGray
 )
 
 @Composable
@@ -52,7 +69,6 @@ fun BazaarTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
