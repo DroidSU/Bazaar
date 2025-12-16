@@ -63,6 +63,7 @@ class ProductRepositoryImpl : ProductRepository {
             if (product.id.isBlank()) {
                 throw IllegalArgumentException("Product ID cannot be empty for an update.")
             }
+            product.lastUpdated = System.currentTimeMillis()
             db.collection("products").document(userId).collection("userProducts")
                 .document(product.id).set(product).await()
             Result.success(Unit)
