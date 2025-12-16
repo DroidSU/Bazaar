@@ -8,6 +8,7 @@ import com.bazaar.models.Product
 import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductRepository
 import com.bazaar.repository.ProductsUiState
+import com.bazaar.utils.SortOption
 import com.bazaar.utils.WeightUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -28,6 +29,9 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
+
+    private val _sortOption = MutableStateFlow(SortOption.NAME_ASC)
+    val sortOption = _sortOption.asStateFlow()
 
     private var originalProducts = listOf<Product>()
 
@@ -83,8 +87,18 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
                 it.name.contains(query, ignoreCase = true)
             }
         }
-        _uiState.value = ProductsUiState.Success(filteredList)
+
+        val sortedList = when (_sortOption.value) {
+            SortOption.NAME_ASC -> filteredList.sortedBy { it.name }
+            SortOption.NAME_DESC -> filteredList.sortedByDescending { it.name }
+            SortOption.RECENTLY_ADDED -> filteredList.sortedByDescending { it.createdOn }
+            SortOption.PRICE_HIGH_TO_LOW -> filteredList.sortedByDescending { it.price }
+            SortOption.PRICE_LOW_TO_HIGH -> filteredList.sortedBy { it.price }
+        }
+
+        _uiState.value = ProductsUiState.Success(sortedList)
     }
+
 
     fun onEditProductClicked(product: Product) {
         _editingProduct.value = product
@@ -199,5 +213,10 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
         viewModelScope.launch {
             repository.updateProduct(product.copy(isDeleted = true))
         }
+    }
+
+    fun onSortOptionChange(sortOption: SortOption) {
+        _sortOption.value = sortOption
+        filterProducts()
     }
 }

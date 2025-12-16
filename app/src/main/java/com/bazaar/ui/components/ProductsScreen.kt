@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -59,6 +60,7 @@ import com.bazaar.models.Product
 import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
+import com.bazaar.utils.SortOption
 import com.bazaar.utils.WeightUnit
 import java.util.Locale
 
@@ -78,7 +80,9 @@ fun ProductScreen(
     onUploadCsv: (Uri) -> Unit,
     onDismissUpload: () -> Unit,
     onSignOut: () -> Unit,
-    onDeleteProduct: (Product) -> Unit
+    onDeleteProduct: (Product) -> Unit,
+    currentSortOption: SortOption,
+    onSortOptionChange: (SortOption) -> Unit
 ) {
     // ---- CSV Picker Logic ----
     val csvPickerLauncher = rememberLauncherForActivityResult(
@@ -194,14 +198,27 @@ fun ProductScreen(
                 }
             }
 
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = onQueryChange,
-                onVoiceSearchClick = onVoiceSearchClick,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = onQueryChange,
+                    onVoiceSearchClick = onVoiceSearchClick,
+                    modifier = Modifier.weight(1f)
+                )
+
+                SortDropDown(
+                    currentSortOption = currentSortOption,
+                    onSortOptionSelected = onSortOptionChange,
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
+
 
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -210,14 +227,16 @@ fun ProductScreen(
                 when (uiState) {
                     is ProductsUiState.Loading -> CircularProgressIndicator()
                     is ProductsUiState.Success -> {
-                        if (uiState.products.isEmpty()) {
+                        val products = uiState.products
+
+                        if (products.isEmpty()) {
                             EmptyState(isSearch = searchQuery.isNotEmpty())
                         } else {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
                                 contentPadding = PaddingValues(bottom = 80.dp)
                             ) {
-                                items(items = uiState.products, key = { it.id }) { product ->
+                                items(items = products, key = { it.id }) { product ->
                                     ProductListItem(
                                         product,
                                         onEditClick = onEditProduct,
@@ -246,6 +265,40 @@ fun ProductScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SortDropDown(
+    currentSortOption: SortOption,
+    onSortOptionSelected: (SortOption) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        // Removed the inner Row as it's not needed
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                Icons.Default.Sort,
+                contentDescription = "Sort Products"
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            SortOption.values().forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.displayName) },
+                    onClick = {
+                        onSortOptionSelected(option)
+                        expanded = false
+                    }
+                )
             }
         }
     }
@@ -320,7 +373,9 @@ private fun ProductScreenPreview() {
             onUploadCsv = {},
             onDismissUpload = {},
             onSignOut = { },
-            onDeleteProduct = {}
+            onDeleteProduct = {},
+            currentSortOption = SortOption.NAME_ASC,
+            onSortOptionChange = {}
         )
     }
 }

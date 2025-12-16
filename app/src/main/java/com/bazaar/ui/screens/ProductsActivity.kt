@@ -12,6 +12,7 @@ import androidx.core.view.WindowCompat
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.ProductScreen
+import com.bazaar.utils.SortOption
 import com.bazaar.vm.ProductsActivityViewModel
 import com.bazaar.vm.ViewModelFactory
 
@@ -59,7 +60,9 @@ class ProductsActivity : ComponentActivity() {
                     },
                     onDismissUpload = viewModel::onDismissUpload,
                     onSignOut = viewModel::signOut,
-                    onDeleteProduct = viewModel::onDeleteProduct
+                    onDeleteProduct = viewModel::onDeleteProduct,
+                    currentSortOption = SortOption.NAME_ASC,
+                    onSortOptionChange = viewModel::onSortOptionChange
                 )
             }
         }
