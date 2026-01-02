@@ -46,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,6 +61,7 @@ import com.bazaar.models.Product
 import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
+import com.bazaar.ui.screens.EditProductActivity
 import com.bazaar.utils.SortOption
 import com.bazaar.utils.WeightUnit
 import java.util.Locale
@@ -72,11 +74,6 @@ fun ProductScreen(
     uploadState: UploadState,
     onQueryChange: (String) -> Unit,
     onAddProduct: () -> Unit,
-    editingProduct: Product?,
-    isSavingUpdate: Boolean,
-    onEditProduct: (Product) -> Unit,
-    onDismissEdit: () -> Unit,
-    onUpdateProduct: (Product) -> Unit,
     onUploadCsv: (Uri) -> Unit,
     onDismissUpload: () -> Unit,
     onSignOut: () -> Unit,
@@ -84,6 +81,8 @@ fun ProductScreen(
     currentSortOption: SortOption,
     onSortOptionChange: (SortOption) -> Unit
 ) {
+    val context = LocalContext.current
+
     // ---- CSV Picker Logic ----
     val csvPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -132,8 +131,6 @@ fun ProductScreen(
                         icon = Icons.Default.UploadFile,
                         description = "Upload excel",
                         onClick = {
-                            // Launch the document picker here
-                            // Pass array of accepted MIME types
                             csvPickerLauncher.launch(
                                 arrayOf(
                                     "text/csv",
@@ -172,11 +169,10 @@ fun ProductScreen(
                     modifier = Modifier.weight(1f)
                 )
 
-                // --- Upload Progress Indicator ---
                 UploadProgressIndicator(
                     uploadState = uploadState,
                     onDismiss = onDismissUpload,
-                    modifier = Modifier.padding(end = 8.dp) // Add some spacing
+                    modifier = Modifier.padding(end = 8.dp)
                 )
 
                 Box {
@@ -219,7 +215,6 @@ fun ProductScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -239,20 +234,25 @@ fun ProductScreen(
                                 items(items = products, key = { it.id }) { product ->
                                     ProductListItem(
                                         product,
-                                        onEditClick = onEditProduct,
+                                        onEditClick = { selectedProduct ->
+                                            // Open the Activity directly
+                                            val intent = Intent(context, EditProductActivity::class.java).apply {
+                                                // Assuming Product is not Parcelable, passing fields individually
+                                                putExtra("PRODUCT_ID", selectedProduct.id)
+                                                putExtra("PRODUCT_NAME", selectedProduct.name)
+                                                putExtra("PRODUCT_QUANTITY", selectedProduct.quantity)
+                                                putExtra("PRODUCT_WEIGHT", selectedProduct.weight)
+                                                putExtra("PRODUCT_UNIT", selectedProduct.weightUnit)
+                                                putExtra("PRODUCT_PRICE", selectedProduct.price)
+                                                putExtra("PRODUCT_CREATED", selectedProduct.createdOn)
+                                            }
+                                            context.startActivity(intent)
+                                        },
                                         onDelete = onDeleteProduct,
                                         onSwipeLeft = {})
                                 }
                             }
-
-                            if (editingProduct != null) {
-                                EditProductSheet(
-                                    product = editingProduct,
-                                    onDismiss = onDismissEdit,
-                                    onSave = onUpdateProduct,
-                                    isSaving = isSavingUpdate
-                                )
-                            }
+                            // Removed: Internal EditProductScreen call
                         }
                     }
 
@@ -279,7 +279,6 @@ private fun SortDropDown(
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        // Removed the inner Row as it's not needed
         IconButton(onClick = { expanded = true }) {
             Icon(
                 Icons.Default.Sort,
@@ -291,7 +290,7 @@ private fun SortDropDown(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            SortOption.values().forEach { option ->
+            SortOption.entries.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option.displayName) },
                     onClick = {
@@ -365,11 +364,6 @@ private fun ProductScreenPreview() {
             uploadState = UploadState.Uploading(50),
             onQueryChange = {},
             onAddProduct = {},
-            editingProduct = null,
-            isSavingUpdate = false,
-            onEditProduct = {},
-            onDismissEdit = {},
-            onUpdateProduct = {},
             onUploadCsv = {},
             onDismissUpload = {},
             onSignOut = { },

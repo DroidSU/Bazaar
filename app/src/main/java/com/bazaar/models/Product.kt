@@ -13,6 +13,7 @@ data class Product(
     @get:PropertyName("createdOn") @set:PropertyName("createdOn") var createdOn: Long = 0,
     @get:PropertyName("isDeleted") @set:PropertyName("isDeleted") var isDeleted: Boolean = false,
     @get:PropertyName("lastUpdated") @set:PropertyName("lastUpdated") var lastUpdated: Long = 0,
+    @get:PropertyName("thresholdValue") @set:PropertyName("thresholdValue") var thresholdValue: Double = 0.0,
 )
 
 

@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bazaar.theme.BazaarTheme
+import com.bazaar.ui.components.AdaptiveThresholdView
 import com.bazaar.ui.components.NeumorphicTextField
 import com.bazaar.ui.components.PriceField
 import com.bazaar.ui.components.QuantitySelector
@@ -62,12 +63,14 @@ class AddProductActivity : ComponentActivity() {
                     productQuantity = viewModel.productQuantity,
                     productWeight = viewModel.productWeight,
                     weightUnit = viewModel.weightUnit,
+                    threshold = viewModel.productThreshold,
                     isSaving = viewModel.isSaving,
                     onNameChange = viewModel::onNameChange,
                     onQuantityChange = viewModel::onQuantityChange,
                     onPriceChange = viewModel::onPriceChange,
                     onWeightChange = viewModel::onWeightChange,
                     onUnitChange = viewModel::onUnitChange,
+                    onThresholdChanged = viewModel::onThresholdChanged,
                     onSave = {
                         viewModel.saveProduct(
                             onSuccess = {
@@ -92,6 +95,7 @@ private fun AddProductScreen(
     productQuantity: String,
     productWeight: String,
     weightUnit: WeightUnit,
+    threshold: Double,
     productPrice: String,
     isSaving: Boolean,
     onNameChange: (String) -> Unit,
@@ -99,6 +103,7 @@ private fun AddProductScreen(
     onPriceChange: (String) -> Unit,
     onWeightChange: (String) -> Unit,
     onUnitChange: (WeightUnit) -> Unit,
+    onThresholdChanged: (Double) -> Unit,
     onSave: () -> Unit
 ) {
     Scaffold(
@@ -134,7 +139,7 @@ private fun AddProductScreen(
 
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp) // Space between label and field
+                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 // Product Name Field
                 Text(
@@ -196,12 +201,19 @@ private fun AddProductScreen(
                 PriceField(
                     value = productPrice,
                     onValueChange = onPriceChange,
-                    modifier = Modifier.height(56.dp) // CHANGE: Removed padding, standardized height
+                    modifier = Modifier.height(56.dp)
                 )
             }
 
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.weight(1f, fill = true))
+            AdaptiveThresholdView(
+                productQuantity = productQuantity.toIntOrNull() ?: 0,
+                productWeight = productWeight.toDoubleOrNull() ?: 0.0,
+                weightUnit = weightUnit,
+                threshold = threshold,
+                onThresholdChanged = onThresholdChanged
+            )
 
             // Save Button
             Button(
@@ -249,10 +261,15 @@ private fun AddProductScreenPreview() {
             productQuantity = "10",
             productPrice = "9.99",
             productWeight = "1.0",
+            threshold = 2.0,
             weightUnit = WeightUnit.KG,
             isSaving = false,
             onNameChange = {},
             onQuantityChange = {},
-            onPriceChange = {}, onSave = {}, onWeightChange = {}, onUnitChange = {})
+            onPriceChange = {},
+            onSave = {},
+            onWeightChange = {},
+            onUnitChange = {},
+            onThresholdChanged = {})
     }
 }

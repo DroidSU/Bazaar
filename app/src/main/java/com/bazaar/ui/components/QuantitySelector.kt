@@ -38,7 +38,7 @@ fun QuantitySelector(
         IconButton(
             onClick = {
                 val currentQuantity = quantity.toIntOrNull() ?: 1
-                if (currentQuantity > 1) {
+                if (currentQuantity > 0) {
                     onQuantityChange((currentQuantity - 1).toString())
                 }
             },
@@ -62,7 +62,7 @@ fun QuantitySelector(
                     onQuantityChange(it)
                 }
             },
-            placeholder = "1",
+            placeholder = "0",
             // Set a fixed width for the text field and remove weight
             modifier = Modifier
                 .width(100.dp)

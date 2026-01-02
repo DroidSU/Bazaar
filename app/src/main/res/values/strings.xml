@@ -3,4 +3,5 @@
     <string name="title_activity_products">ProductsActivity</string>
     <string name="title_activity_edit_product_details">EditProductDetailsActivity</string>
     <string name="title_activity_authentication">AuthenticationActivity</string>
+    <string name="title_activity_edit_product">EditProductActivity</string>
 </resources>

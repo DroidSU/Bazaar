@@ -27,8 +27,6 @@ class ProductsActivity : ComponentActivity() {
             BazaarTheme {
                 val uiState by viewModel.uiState.collectAsState(initial = ProductsUiState.Loading)
                 val searchQuery by viewModel.searchQuery.collectAsState()
-                val editingProduct by viewModel.editingProduct.collectAsState()
-                val isSavingUpdate by viewModel.isSavingUpdate.collectAsState()
                 val uploadState by viewModel.uploadState.collectAsState()
                 val isSignedOut by viewModel.isSignedOut.collectAsState()
 
@@ -50,11 +48,6 @@ class ProductsActivity : ComponentActivity() {
                     onAddProduct = {
                         startActivity(Intent(this, AddProductActivity::class.java))
                     },
-                    editingProduct = editingProduct,
-                    isSavingUpdate = isSavingUpdate,
-                    onEditProduct = viewModel::onEditProductClicked,
-                    onDismissEdit = viewModel::onDismissEdit,
-                    onUpdateProduct = viewModel::onUpdateProduct,
                     onUploadCsv = { uri ->
                         viewModel.uploadProductsFromCsv(contentResolver, uri)
                     },

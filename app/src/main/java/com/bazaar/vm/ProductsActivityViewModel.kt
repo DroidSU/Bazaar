@@ -13,7 +13,6 @@ import com.bazaar.utils.WeightUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -34,14 +33,6 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
     val sortOption = _sortOption.asStateFlow()
 
     private var originalProducts = listOf<Product>()
-
-    // StateFlow to manage the state of the product being edited.
-    private val _editingProduct = MutableStateFlow<Product?>(null)
-    val editingProduct: StateFlow<Product?> = _editingProduct.asStateFlow()
-
-    // StateFlow to indicate if an update operation is in progress.
-    private val _isSavingUpdate = MutableStateFlow(false)
-    val isSavingUpdate: StateFlow<Boolean> = _isSavingUpdate.asStateFlow()
 
     // StateFlow to manage the state of the CSV upload.
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
@@ -97,28 +88,6 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
         }
 
         _uiState.value = ProductsUiState.Success(sortedList)
-    }
-
-
-    fun onEditProductClicked(product: Product) {
-        _editingProduct.value = product
-    }
-
-    fun onDismissEdit() {
-        _editingProduct.value = null
-    }
-
-    fun onUpdateProduct(product: Product) {
-        viewModelScope.launch {
-            _isSavingUpdate.value = true
-            val result = repository.updateProduct(product)
-            result.onSuccess {
-                _isSavingUpdate.value = false
-                onDismissEdit() // Close the sheet on success
-            }.onFailure {
-                _isSavingUpdate.value = false
-            }
-        }
     }
 
     fun onDismissUpload() {

@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.lottie.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.play.services.auth)
+    implementation(libs.androidx.material3)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
