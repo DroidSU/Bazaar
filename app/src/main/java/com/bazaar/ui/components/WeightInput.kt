@@ -39,7 +39,8 @@ fun WeightInput(
     unit: WeightUnit,
     onValueChange: (String) -> Unit,
     onUnitChange: (WeightUnit) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Row(
         modifier = modifier
@@ -66,7 +67,8 @@ fun WeightInput(
                 unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            enabled = enabled
         )
 
         // Custom Unit Toggle Switch

@@ -245,6 +245,7 @@ fun ProductScreen(
                                                 putExtra("PRODUCT_UNIT", selectedProduct.weightUnit)
                                                 putExtra("PRODUCT_PRICE", selectedProduct.price)
                                                 putExtra("PRODUCT_CREATED", selectedProduct.createdOn)
+                                                putExtra("PRODUCT_THRESHOLD", selectedProduct.thresholdValue)
                                             }
                                             context.startActivity(intent)
                                         },

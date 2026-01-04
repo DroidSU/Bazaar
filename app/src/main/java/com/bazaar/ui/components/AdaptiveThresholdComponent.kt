@@ -36,7 +36,8 @@ fun AdaptiveThresholdView(
     productWeight: Double,
     weightUnit: WeightUnit,
     threshold: Double,
-    onThresholdChanged: (Double) -> Unit
+    onThresholdChanged: (Double) -> Unit,
+    enabled: Boolean = true
 ){
     val isQuantityEntered = productQuantity > 0
     val isWeightEntered = productWeight > 0.0
@@ -61,7 +62,6 @@ fun AdaptiveThresholdView(
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .shadow(
                 elevation = if (isEnabled) 8.dp else 2.dp,
@@ -149,7 +149,8 @@ fun AdaptiveThresholdView(
                     shape = RoundedCornerShape(14.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-                    )
+                    ),
+                    enabled = enabled
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Remove,
@@ -201,7 +202,8 @@ fun AdaptiveThresholdView(
                     shape = RoundedCornerShape(14.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = MaterialTheme.colorScheme.primary
-                    )
+                    ),
+                    enabled = enabled
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Add,

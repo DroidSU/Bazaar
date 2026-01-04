@@ -6,22 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import com.bazaar.models.Product
+import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.EditProductScreen
-import com.bazaar.ui.screens.ui.theme.BazaarTheme
 import com.bazaar.utils.WeightUnit
 import com.bazaar.vm.EditProductsViewModel
 import com.bazaar.vm.ViewModelFactory
 
 class EditProductActivity : ComponentActivity() {
+
     private val viewModel: EditProductsViewModel by viewModels { ViewModelFactory() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Retrieve data from Intent
         val productId = intent.getStringExtra("PRODUCT_ID") ?: ""
         val productName = intent.getStringExtra("PRODUCT_NAME") ?: ""
         val productQuantity = intent.getIntExtra("PRODUCT_QUANTITY", 0)
@@ -29,6 +28,7 @@ class EditProductActivity : ComponentActivity() {
         val productUnit = intent.getStringExtra("PRODUCT_UNIT") ?: WeightUnit.GM.name
         val productPrice = intent.getDoubleExtra("PRODUCT_PRICE", 0.0)
         val productCreated = intent.getLongExtra("PRODUCT_CREATED", System.currentTimeMillis())
+        val threshold = intent.getDoubleExtra("PRODUCT_THRESHOLD", 0.0)
 
         val initialProduct = Product(
             id = productId,
@@ -37,23 +37,25 @@ class EditProductActivity : ComponentActivity() {
             weight = productWeight,
             weightUnit = productUnit,
             price = productPrice,
-            createdOn = productCreated
+            createdOn = productCreated,
+            thresholdValue = threshold
         )
 
         setContent {
             BazaarTheme {
-                val editingProduct by viewModel.editingProduct.collectAsState()
-                val isSavingUpdate by viewModel.isSavingUpdate.collectAsState()
+                val uiState = viewModel.uiState.collectAsState()
 
                 EditProductScreen(
                     product = initialProduct,
-                    isSaving = isSavingUpdate,
                     onDismiss = {
                         finish()
                     },
                     onSave = { updatedProduct ->
-                        // TODO: Implement actual save logic (e.g., ViewModel call or Intent result)
-
+                        viewModel.onUpdateProduct(product = updatedProduct)
+                    },
+                    uiState = uiState.value,
+                    onReset = {
+                        viewModel.resetState()
                     }
                 )
             }

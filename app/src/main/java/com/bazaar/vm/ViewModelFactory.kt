@@ -18,6 +18,9 @@ class ViewModelFactory : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(AuthRepositoryImpl()) as T
             }
+            modelClass.isAssignableFrom(EditProductsViewModel::class.java) -> {
+                EditProductsViewModel(ProductRepositoryImpl()) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

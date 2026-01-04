@@ -31,7 +31,8 @@ import java.util.Locale
 fun PriceField(
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val currencySymbol = NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: "$"
 
@@ -57,6 +58,7 @@ fun PriceField(
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
         ),
+        enabled = enabled,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         decorationBox = { innerTextField ->
             Row(

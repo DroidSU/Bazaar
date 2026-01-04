@@ -3,6 +3,11 @@
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- Add this section -->
+    <queries>
+        <package android:name="com.google.android.gms" />
+    </queries>
+
     <application
         android:name=".utils.CustomApplication"
         android:allowBackup="true"

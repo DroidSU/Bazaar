@@ -139,81 +139,83 @@ private fun AddProductScreen(
 
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(5.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 // Product Name Field
-                Text(
-                    text = "Product Name",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                NeumorphicTextField(
-                    value = productName,
-                    onValueChange = onNameChange,
-                    placeholder = "e.g., Wireless Headphones",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                Column {
+                    Text(
+                        text = "Product Name",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
+                    NeumorphicTextField(
+                        value = productName,
+                        onValueChange = onNameChange,
+                        placeholder = "e.g., Wireless Headphones",
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        )
+                    )
+                }
 
                 // Quantity Field
-                Text(
-                    text = "Quantity",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                QuantitySelector(
-                    quantity = productQuantity,
-                    onQuantityChange = onQuantityChange
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Column {
+                    Text(
+                        text = "Quantity",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    QuantitySelector(
+                        quantity = productQuantity,
+                        onQuantityChange = onQuantityChange
+                    )
+                }
 
                 // Weight Field
-                Text(
-                    text = "Weight (Optional)",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                WeightInput(
-                    value = productWeight,
-                    unit = weightUnit,
-                    onValueChange = onWeightChange,
-                    onUnitChange = onUnitChange,
-                    modifier = Modifier.fillMaxWidth() // CHANGE: Removed horizontal padding
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Column {
+                    Text(
+                        text = "Weight (Optional)",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    WeightInput(
+                        value = productWeight,
+                        unit = weightUnit,
+                        onValueChange = onWeightChange,
+                        onUnitChange = onUnitChange,
+                        modifier = Modifier.fillMaxWidth() // CHANGE: Removed horizontal padding
+                    )
+                }
 
                 // Price Field
-                Text(
-                    text = "Price",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                PriceField(
-                    value = productPrice,
-                    onValueChange = onPriceChange,
-                    modifier = Modifier.height(56.dp)
+                Column {
+                    Text(
+                        text = "Price",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    PriceField(
+                        value = productPrice,
+                        onValueChange = onPriceChange,
+                        modifier = Modifier.height(56.dp)
+                    )
+                }
+
+                AdaptiveThresholdView(
+                    productQuantity = productQuantity.toIntOrNull() ?: 0,
+                    productWeight = productWeight.toDoubleOrNull() ?: 0.0,
+                    weightUnit = weightUnit,
+                    threshold = threshold,
+                    onThresholdChanged = onThresholdChanged
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            AdaptiveThresholdView(
-                productQuantity = productQuantity.toIntOrNull() ?: 0,
-                productWeight = productWeight.toDoubleOrNull() ?: 0.0,
-                weightUnit = weightUnit,
-                threshold = threshold,
-                onThresholdChanged = onThresholdChanged
-            )
 
             // Save Button
             Button(
@@ -247,6 +249,7 @@ private fun AddProductScreen(
                     )
                 }
             }
+
         }
     }
 }
