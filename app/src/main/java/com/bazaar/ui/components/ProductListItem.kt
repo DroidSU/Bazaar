@@ -140,60 +140,70 @@ fun ProductContent(product: Product, onEditClick: (Product) -> Unit) {
             onEditClick(product)
         }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                Text(
-                    text = product.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 12.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = product.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 12.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Bottom Row: Details and Price
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Details Column: Grouping Quantity and Weight vertically
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        if (product.quantity > 0) {
+                            Text(
+                                text = "Qty: ${product.quantity}",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 14.sp
+                            )
+                        }
+                        if (product.weight > 0) {
+                            Text(
+                                text = "Weight: ${product.weight} ${product.weightUnit.lowercase()}",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                    // Price, aligned to the end
+                    Text(
+                        text = currencyFormat.format(product.price),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Bottom Row: Details and Price
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Details Column: Grouping Quantity and Weight vertically
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    if (product.quantity > 0) {
-                        Text(
-                            text = "Qty: ${product.quantity}",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 14.sp
-                        )
-                    }
-                    if (product.weight > 0) {
-                        Text(
-                            text = "Weight: ${product.weight} ${product.weightUnit.lowercase()}",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-                // Price, aligned to the end
-                Text(
-                    text = currencyFormat.format(product.price),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.secondary
+            if(product.quantity < product.thresholdValue) {
+                LowStockIndicator(
+                    modifier = Modifier.align(Alignment.TopEnd)
                 )
             }
         }
