@@ -82,7 +82,8 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
         val sortedList = when (_sortOption.value) {
             SortOption.NAME_ASC -> filteredList.sortedBy { it.name }
             SortOption.NAME_DESC -> filteredList.sortedByDescending { it.name }
-            SortOption.RECENTLY_ADDED -> filteredList.sortedByDescending { it.createdOn }
+//            SortOption.RECENTLY_ADDED -> filteredList.sortedByDescending { it.createdOn }
+            SortOption.STOCK_ALERTS -> filteredList.sortedByDescending { it.quantity < it.thresholdValue || it.weight < it.thresholdValue }
             SortOption.PRICE_HIGH_TO_LOW -> filteredList.sortedByDescending { it.price }
             SortOption.PRICE_LOW_TO_HIGH -> filteredList.sortedBy { it.price }
         }

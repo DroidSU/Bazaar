@@ -12,7 +12,6 @@ import androidx.core.view.WindowCompat
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.ProductScreen
-import com.bazaar.utils.SortOption
 import com.bazaar.vm.ProductsActivityViewModel
 import com.bazaar.vm.ViewModelFactory
 
@@ -29,6 +28,7 @@ class ProductsActivity : ComponentActivity() {
                 val searchQuery by viewModel.searchQuery.collectAsState()
                 val uploadState by viewModel.uploadState.collectAsState()
                 val isSignedOut by viewModel.isSignedOut.collectAsState()
+                val sortOption by viewModel.sortOption.collectAsState()
 
                 if(isSignedOut) {
                     LaunchedEffect(Unit) {
@@ -54,7 +54,7 @@ class ProductsActivity : ComponentActivity() {
                     onDismissUpload = viewModel::onDismissUpload,
                     onSignOut = viewModel::signOut,
                     onDeleteProduct = viewModel::onDeleteProduct,
-                    currentSortOption = SortOption.NAME_ASC,
+                    currentSortOption = sortOption,
                     onSortOptionChange = viewModel::onSortOptionChange
                 )
             }

@@ -37,6 +37,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -236,16 +238,28 @@ fun ProductScreen(
                                         product,
                                         onEditClick = { selectedProduct ->
                                             // Open the Activity directly
-                                            val intent = Intent(context, EditProductActivity::class.java).apply {
+                                            val intent = Intent(
+                                                context,
+                                                EditProductActivity::class.java
+                                            ).apply {
                                                 // Assuming Product is not Parcelable, passing fields individually
                                                 putExtra("PRODUCT_ID", selectedProduct.id)
                                                 putExtra("PRODUCT_NAME", selectedProduct.name)
-                                                putExtra("PRODUCT_QUANTITY", selectedProduct.quantity)
+                                                putExtra(
+                                                    "PRODUCT_QUANTITY",
+                                                    selectedProduct.quantity
+                                                )
                                                 putExtra("PRODUCT_WEIGHT", selectedProduct.weight)
                                                 putExtra("PRODUCT_UNIT", selectedProduct.weightUnit)
                                                 putExtra("PRODUCT_PRICE", selectedProduct.price)
-                                                putExtra("PRODUCT_CREATED", selectedProduct.createdOn)
-                                                putExtra("PRODUCT_THRESHOLD", selectedProduct.thresholdValue)
+                                                putExtra(
+                                                    "PRODUCT_CREATED",
+                                                    selectedProduct.createdOn
+                                                )
+                                                putExtra(
+                                                    "PRODUCT_THRESHOLD",
+                                                    selectedProduct.thresholdValue
+                                                )
                                             }
                                             context.startActivity(intent)
                                         },
@@ -293,11 +307,22 @@ private fun SortDropDown(
         ) {
             SortOption.entries.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.displayName) },
+                    text = {
+                        Text(
+                            option.displayName,
+                            fontWeight = if (option == currentSortOption) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
                     onClick = {
                         onSortOptionSelected(option)
                         expanded = false
-                    }
+                    },
+                    modifier = Modifier.background(
+                        if (option == currentSortOption) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
+                    ),
+                    colors = MenuDefaults.itemColors(
+                        textColor = if (option == currentSortOption) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                    )
                 )
             }
         }
