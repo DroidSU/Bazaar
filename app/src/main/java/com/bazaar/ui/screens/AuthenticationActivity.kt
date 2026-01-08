@@ -82,7 +82,7 @@ class AuthenticationActivity : ComponentActivity() {
                     onAuthSuccess = {
                         Toast.makeText(this, "Authentication Successful!", Toast.LENGTH_SHORT)
                             .show()
-                        val intent = Intent(this, ProductsActivity::class.java)
+                        val intent = Intent(this, DashboardActivity::class.java)
                         startActivity(intent)
                         finish()
                     },

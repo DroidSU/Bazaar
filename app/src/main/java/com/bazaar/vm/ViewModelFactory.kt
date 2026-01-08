@@ -3,6 +3,7 @@ package com.bazaar.vm
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bazaar.data.repository.AuthRepositoryImpl
+import com.bazaar.repository.DashboardRepositoryImpl
 import com.bazaar.repository.ProductRepositoryImpl
 
 class ViewModelFactory : ViewModelProvider.Factory {
@@ -20,6 +21,9 @@ class ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(EditProductsViewModel::class.java) -> {
                 EditProductsViewModel(ProductRepositoryImpl()) as T
+            }
+            modelClass.isAssignableFrom(DashboardViewModel::class.java) -> {
+                DashboardViewModel(DashboardRepositoryImpl()) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

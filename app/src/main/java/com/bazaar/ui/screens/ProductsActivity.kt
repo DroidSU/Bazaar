@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
@@ -27,18 +26,7 @@ class ProductsActivity : ComponentActivity() {
                 val uiState by viewModel.uiState.collectAsState(initial = ProductsUiState.Loading)
                 val searchQuery by viewModel.searchQuery.collectAsState()
                 val uploadState by viewModel.uploadState.collectAsState()
-                val isSignedOut by viewModel.isSignedOut.collectAsState()
                 val sortOption by viewModel.sortOption.collectAsState()
-
-                if(isSignedOut) {
-                    LaunchedEffect(Unit) {
-                        val intent = Intent(this@ProductsActivity, AuthenticationActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                        startActivity(intent)
-                        finish()
-                    }
-                }
 
                 ProductScreen(
                     uiState = uiState,

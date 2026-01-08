@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
-    <!-- Add this section -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- Add this section -->
     <queries>
         <package android:name="com.google.android.gms" />
     </queries>
@@ -18,6 +16,11 @@
         android:roundIcon="@mipmap/ic_bazaar_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Bazaar">
+        <activity
+            android:name=".ui.screens.DashboardActivity"
+            android:exported="false"
+            android:label="@string/title_activity_dashboard"
+            android:theme="@style/Theme.Bazaar" />
         <activity
             android:name=".ui.screens.EditProductActivity"
             android:exported="false"

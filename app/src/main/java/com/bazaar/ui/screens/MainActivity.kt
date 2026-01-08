@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 SplashScreen {
                     val auth = FirebaseAuth.getInstance()
                     val targetActivity = if (auth.currentUser != null) {
-                        ProductsActivity::class.java
+                        DashboardActivity::class.java
                     } else {
                         AuthenticationActivity::class.java
                     }

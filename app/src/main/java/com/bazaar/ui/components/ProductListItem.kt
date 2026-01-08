@@ -168,13 +168,12 @@ fun ProductContent(product: Product, onEditClick: (Product) -> Unit) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Bottom Row: Details and Price
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Details Column: Grouping Quantity and Weight vertically
+
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         if (product.quantity > 0) {
                             Text(
@@ -191,7 +190,7 @@ fun ProductContent(product: Product, onEditClick: (Product) -> Unit) {
                             )
                         }
                     }
-                    // Price, aligned to the end
+
                     Text(
                         text = currencyFormat.format(product.price),
                         fontWeight = FontWeight.Bold,
