@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bazaar.db.dao.ProductsDAO
 import com.bazaar.models.Product
 import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductRepository
@@ -21,7 +22,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.UUID
 
-class ProductsActivityViewModel(private val repository: ProductRepository) : ViewModel() {
+class ProductsActivityViewModel(private val repository: ProductRepository, private val productsDAO: ProductsDAO) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ProductsUiState>(ProductsUiState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -38,11 +39,28 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
     val uploadState = _uploadState.asStateFlow()
 
-    private val _isSignedOut = MutableStateFlow(false)
-    val isSignedOut = _isSignedOut.asStateFlow()
-
     init {
-        collectProducts()
+//        collectProducts()
+        getProductsFromDB()
+    }
+
+    private fun getProductsFromDB() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getProducts()
+                .catch { exception ->
+                    _uiState.value =
+                        ProductsUiState.Error(exception.message ?: "An unknown error occurred")
+                }
+                .collect { result ->
+                result.onSuccess { products ->
+                    originalProducts = products.filter { !it.isDeleted }
+                    _uiState.value = ProductsUiState.Success(originalProducts)
+                }.onFailure {
+                    _uiState.value =
+                        ProductsUiState.Error(it.message ?: "An unknown error occurred")
+                }
+            }
+        }
     }
 
     private fun collectProducts() {
@@ -82,8 +100,7 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
         val sortedList = when (_sortOption.value) {
             SortOption.NAME_ASC -> filteredList.sortedBy { it.name }
             SortOption.NAME_DESC -> filteredList.sortedByDescending { it.name }
-//            SortOption.RECENTLY_ADDED -> filteredList.sortedByDescending { it.createdOn }
-            SortOption.STOCK_ALERTS -> filteredList.sortedByDescending { it.quantity < it.thresholdValue || it.weight < it.thresholdValue }
+            SortOption.STOCK_ALERTS -> filteredList.sortedByDescending { it.quantity < it.thresholdValue }
             SortOption.PRICE_HIGH_TO_LOW -> filteredList.sortedByDescending { it.price }
             SortOption.PRICE_LOW_TO_HIGH -> filteredList.sortedBy { it.price }
         }
@@ -164,15 +181,6 @@ class ProductsActivityViewModel(private val repository: ProductRepository) : Vie
                 }
             }
             products
-        }
-    }
-
-    fun signOut() {
-        viewModelScope.launch {
-            val result = repository.signOut()
-            if(result.isSuccess) {
-                _isSignedOut.value = true
-            }
         }
     }
 

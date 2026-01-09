@@ -78,7 +78,6 @@ fun ProductScreen(
     onAddProduct: () -> Unit,
     onUploadCsv: (Uri) -> Unit,
     onDismissUpload: () -> Unit,
-    onSignOut: () -> Unit,
     onDeleteProduct: (Product) -> Unit,
     currentSortOption: SortOption,
     onSortOptionChange: (SortOption) -> Unit
@@ -176,24 +175,6 @@ fun ProductScreen(
                     onDismiss = onDismissUpload,
                     modifier = Modifier.padding(end = 8.dp)
                 )
-
-                Box {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
-                    }
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Sign out") },
-                            onClick = {
-                                menuExpanded = false
-                                onSignOut()
-                            }
-                        )
-                    }
-                }
             }
 
             Row(
@@ -392,7 +373,6 @@ private fun ProductScreenPreview() {
             onAddProduct = {},
             onUploadCsv = {},
             onDismissUpload = {},
-            onSignOut = { },
             onDeleteProduct = {},
             currentSortOption = SortOption.NAME_ASC,
             onSortOptionChange = {}

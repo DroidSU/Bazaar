@@ -1,12 +1,14 @@
 package com.bazaar.vm
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bazaar.data.repository.AuthRepositoryImpl
 import com.bazaar.repository.DashboardRepositoryImpl
 import com.bazaar.repository.ProductRepositoryImpl
+import com.bazaar.utils.AppDatabase
 
-class ViewModelFactory : ViewModelProvider.Factory {
+class ViewModelFactory(private val context : Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
@@ -14,7 +16,8 @@ class ViewModelFactory : ViewModelProvider.Factory {
                 AddProductViewModel(ProductRepositoryImpl()) as T
             }
             modelClass.isAssignableFrom(ProductsActivityViewModel::class.java) -> {
-                ProductsActivityViewModel(ProductRepositoryImpl()) as T
+                val db = AppDatabase.getInstance(context)
+                ProductsActivityViewModel(ProductRepositoryImpl(), db.productDao()) as T
             }
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(AuthRepositoryImpl()) as T
@@ -23,7 +26,8 @@ class ViewModelFactory : ViewModelProvider.Factory {
                 EditProductsViewModel(ProductRepositoryImpl()) as T
             }
             modelClass.isAssignableFrom(DashboardViewModel::class.java) -> {
-                DashboardViewModel(DashboardRepositoryImpl()) as T
+                val db = AppDatabase.getInstance(context)
+                DashboardViewModel(DashboardRepositoryImpl(db.productDao())) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

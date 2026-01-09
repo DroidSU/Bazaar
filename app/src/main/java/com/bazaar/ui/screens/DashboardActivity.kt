@@ -9,12 +9,13 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.bazaar.models.Product
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.vm.DashboardViewModel
 import com.bazaar.vm.ViewModelFactory
 
 class DashboardActivity : ComponentActivity() {
-    private val viewModel: DashboardViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: DashboardViewModel by viewModels { ViewModelFactory(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +24,9 @@ class DashboardActivity : ComponentActivity() {
         setContent {
             BazaarTheme {
                 val isSignedOut by viewModel.isSignedOut.collectAsState()
+                val productList by viewModel.productList.collectAsState(emptyList<Product>())
+                val lowStockCount by viewModel.lowStockCount.collectAsState(0)
+                val outOfStockCount by viewModel.outOfStockCount.collectAsState(0)
 
                 if(isSignedOut) {
                     LaunchedEffect(Unit) {
@@ -34,7 +38,19 @@ class DashboardActivity : ComponentActivity() {
                     }
                 }
 
-                DashboardScreen()
+                DashboardScreen(
+                    productList = productList,
+                    onTotalItemsClicked = {
+                        val intent = Intent(this, ProductsActivity::class.java)
+                        startActivity(intent)
+                    },
+                    onAddNewItemClicked = {
+                        val intent = Intent(this, AddProductActivity::class.java)
+                        startActivity(intent)
+                    },
+                    lowStockCount = lowStockCount,
+                    outOfStockCount = outOfStockCount
+                )
             }
         }
     }

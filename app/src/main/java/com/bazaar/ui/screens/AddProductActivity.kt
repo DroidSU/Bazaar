@@ -50,7 +50,7 @@ import com.bazaar.vm.ViewModelFactory
 
 class AddProductActivity : ComponentActivity() {
 
-    private val viewModel: AddProductViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: AddProductViewModel by viewModels { ViewModelFactory(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

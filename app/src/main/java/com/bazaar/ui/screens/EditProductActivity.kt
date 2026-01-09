@@ -15,7 +15,7 @@ import com.bazaar.vm.ViewModelFactory
 
 class EditProductActivity : ComponentActivity() {
 
-    private val viewModel: EditProductsViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: EditProductsViewModel by viewModels { ViewModelFactory(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

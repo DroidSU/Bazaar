@@ -1,6 +1,7 @@
 package com.bazaar.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.AddShoppingCart
 import androidx.compose.material.icons.rounded.Inventory
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.bazaar.models.Product
 import com.bazaar.theme.BazaarTheme
 import com.bazaar.theme.md_dashboard_low_stock_background_dark
 import com.bazaar.theme.md_dashboard_low_stock_background_light
@@ -58,10 +60,15 @@ import com.bazaar.theme.md_dashboard_out_of_stock_icon_light
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    productList: List<Product>,
+    onTotalItemsClicked: () -> Unit,
+    onAddNewItemClicked: () -> Unit,
+    lowStockCount: Int,
+    outOfStockCount: Int
+) {
     // Define dynamic colors based on theme
     val isDark = isSystemInDarkTheme()
-
     // Low Stock Colors
     val lowStockIconColor = if (isDark) md_dashboard_low_stock_icon_dark else md_dashboard_low_stock_icon_light
     val lowStockContainerColor = if (isDark) md_dashboard_low_stock_background_dark else md_dashboard_low_stock_background_light
@@ -90,11 +97,11 @@ fun DashboardScreen() {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Handle notifications */ }) {
+                    IconButton(onClick = { /* TODO: Handle more actions */ }) {
                         Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = "Notifications",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            imageVector = Icons.Outlined.MoreVert,
+                            contentDescription = "More Options",
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
@@ -115,7 +122,7 @@ fun DashboardScreen() {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 // Main Overview Card
-                TotalItemsCard(count = 1245)
+                TotalItemsCard(count = (productList.count { !it.isDeleted }), onTotalItemsClicked = onTotalItemsClicked)
             }
 
             item {
@@ -127,7 +134,7 @@ fun DashboardScreen() {
                     StatusCard(
                         modifier = Modifier.weight(1f),
                         title = "Low Stock",
-                        count = 12,
+                        count = lowStockCount,
                         icon = Icons.Filled.Warning,
                         iconTint = lowStockIconColor,
                         containerColor = lowStockContainerColor
@@ -135,7 +142,7 @@ fun DashboardScreen() {
                     StatusCard(
                         modifier = Modifier.weight(1f),
                         title = "Out of Stock",
-                        count = 4,
+                        count = outOfStockCount,
                         icon = Icons.Outlined.Inventory2,
                         iconTint = outOfStockIconColor,
                         containerColor = outOfStockContainerColor
@@ -151,18 +158,28 @@ fun DashboardScreen() {
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                QuickActionsGrid()
+                QuickActionsGrid(
+                    onInventoryClicked = {
+                        onTotalItemsClicked()
+                    },
+                    onAddNewItemClicked = {
+
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun TotalItemsCard(count: Int) {
+fun TotalItemsCard(count: Int, onTotalItemsClicked: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp),
+            .height(140.dp)
+            .clickable {
+                onTotalItemsClicked()
+            },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -220,8 +237,6 @@ fun StatusCard(
     iconTint: Color,
     containerColor: Color
 ) {
-    // Dynamic text colors based on the container color isn't always reliable with hardcoded backgrounds,
-    // so we use specific logic: dark text for light containers, light text for dark containers.
     val isDark = isSystemInDarkTheme()
     val textColor = if (isDark) Color(0xFFEEEEEE) else Color(0xFF212121)
     val subTextColor = if (isDark) Color(0xB3EEEEEE) else Color(0x99000000)
@@ -276,7 +291,10 @@ fun StatusCard(
 }
 
 @Composable
-fun QuickActionsGrid() {
+fun QuickActionsGrid(
+    onInventoryClicked: () -> Unit,
+    onAddNewItemClicked: () -> Unit
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         QuickActionButton(
             title = "Process Sale / Restock",
@@ -288,13 +306,17 @@ fun QuickActionsGrid() {
             title = "Manage Inventory",
             subtitle = "Add, edit, or remove items",
             icon = Icons.Rounded.Inventory,
-            onClick = { /* TODO: Navigate to Inventory */ }
+            onClick = {
+                onInventoryClicked()
+            }
         )
         QuickActionButton(
             title = "Add New Item",
             subtitle = "Create a product entry",
             icon = Icons.Filled.Add,
-            onClick = { /* TODO: Navigate to Add Item */ }
+            onClick = {
+                onAddNewItemClicked()
+            }
         )
     }
 }
@@ -359,6 +381,12 @@ fun QuickActionButton(
 @Composable
 private fun DashboardScreenPreview() {
     BazaarTheme {
-        DashboardScreen()
+        DashboardScreen(
+            productList = emptyList(),
+            onTotalItemsClicked = {},
+            onAddNewItemClicked = {},
+            lowStockCount = 0,
+            outOfStockCount = 0
+        )
     }
 }

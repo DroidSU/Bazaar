@@ -1,10 +1,14 @@
 package com.bazaar.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.bazaar.utils.ConstantsManager
 import com.bazaar.utils.WeightUnit
 import com.google.firebase.firestore.PropertyName
 
+@Entity(ConstantsManager.COLLECTION_PRODUCTS)
 data class Product(
-    @get:PropertyName("id") @set:PropertyName("id") var id: String = "",
+    @PrimaryKey @get:PropertyName("id") @set:PropertyName("id") var id: String = "",
     @get:PropertyName("name") @set:PropertyName("name") var name: String = "",
     @get:PropertyName("quantity") @set:PropertyName("quantity") var quantity: Int = 0,
     @get:PropertyName("price") @set:PropertyName("price") var price: Double = 0.0,

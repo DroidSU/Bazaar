@@ -16,7 +16,7 @@ import com.bazaar.vm.ViewModelFactory
 
 class ProductsActivity : ComponentActivity() {
 
-    private val viewModel: ProductsActivityViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: ProductsActivityViewModel by viewModels { ViewModelFactory(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +40,6 @@ class ProductsActivity : ComponentActivity() {
                         viewModel.uploadProductsFromCsv(contentResolver, uri)
                     },
                     onDismissUpload = viewModel::onDismissUpload,
-                    onSignOut = viewModel::signOut,
                     onDeleteProduct = viewModel::onDeleteProduct,
                     currentSortOption = sortOption,
                     onSortOptionChange = viewModel::onSortOptionChange

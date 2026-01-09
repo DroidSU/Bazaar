@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -57,6 +58,9 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.benchmark.common)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx) // For coroutines support (suspend functions)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

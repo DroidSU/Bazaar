@@ -68,7 +68,7 @@ class AuthenticationActivity : ComponentActivity() {
         GoogleSignIn.getClient(this, gso)
     }
 
-    private val viewModel: AuthViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: AuthViewModel by viewModels { ViewModelFactory(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
