@@ -1,4 +1,4 @@
-package com.bazaar.ui.screens
+package com.bazaar.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,6 +62,7 @@ import com.bazaar.theme.md_dashboard_out_of_stock_icon_light
 @Composable
 fun DashboardScreen(
     productList: List<Product>,
+    onTransactionsClicked: () -> Unit,
     onTotalItemsClicked: () -> Unit,
     onAddNewItemClicked: () -> Unit,
     lowStockCount: Int,
@@ -159,11 +160,14 @@ fun DashboardScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 QuickActionsGrid(
+                    onTransactionsClicked = {
+                        onTransactionsClicked()
+                    },
                     onInventoryClicked = {
                         onTotalItemsClicked()
                     },
                     onAddNewItemClicked = {
-
+                        onAddNewItemClicked()
                     }
                 )
             }
@@ -273,7 +277,9 @@ fun StatusCard(
                     )
                 }
             }
-            Column {
+            Column(
+                modifier = Modifier.padding(start = 6.dp)
+            ) {
                 Text(
                     text = count.toString(),
                     style = MaterialTheme.typography.headlineMedium,
@@ -292,6 +298,7 @@ fun StatusCard(
 
 @Composable
 fun QuickActionsGrid(
+    onTransactionsClicked: () -> Unit,
     onInventoryClicked: () -> Unit,
     onAddNewItemClicked: () -> Unit
 ) {
@@ -300,7 +307,9 @@ fun QuickActionsGrid(
             title = "Process Sale / Restock",
             subtitle = "Update item quantities",
             icon = Icons.Rounded.AddShoppingCart,
-            onClick = { /* TODO: Navigate to Sales */ }
+            onClick = {
+                onTransactionsClicked()
+            }
         )
         QuickActionButton(
             title = "Manage Inventory",
@@ -383,6 +392,7 @@ private fun DashboardScreenPreview() {
     BazaarTheme {
         DashboardScreen(
             productList = emptyList(),
+            onTransactionsClicked = {},
             onTotalItemsClicked = {},
             onAddNewItemClicked = {},
             lowStockCount = 0,

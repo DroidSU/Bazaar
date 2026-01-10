@@ -63,7 +63,7 @@ import com.bazaar.models.Product
 import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.theme.BazaarTheme
-import com.bazaar.ui.screens.EditProductActivity
+import com.bazaar.ui.activities.EditProductActivity
 import com.bazaar.utils.SortOption
 import com.bazaar.utils.WeightUnit
 import java.util.Locale

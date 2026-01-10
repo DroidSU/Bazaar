@@ -1,4 +1,4 @@
-package com.bazaar.ui.screens
+package com.bazaar.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.bazaar.models.Product
 import com.bazaar.theme.BazaarTheme
+import com.bazaar.ui.components.DashboardScreen
 import com.bazaar.vm.DashboardViewModel
 import com.bazaar.vm.ViewModelFactory
 
@@ -40,13 +41,14 @@ class DashboardActivity : ComponentActivity() {
 
                 DashboardScreen(
                     productList = productList,
+                    onTransactionsClicked = {
+                        startActivity(Intent(this, TransactionsActivity::class.java))
+                    },
                     onTotalItemsClicked = {
-                        val intent = Intent(this, ProductsActivity::class.java)
-                        startActivity(intent)
+                        startActivity(Intent(this, ProductsActivity::class.java))
                     },
                     onAddNewItemClicked = {
-                        val intent = Intent(this, AddProductActivity::class.java)
-                        startActivity(intent)
+                        startActivity(Intent(this, AddProductActivity::class.java))
                     },
                     lowStockCount = lowStockCount,
                     outOfStockCount = outOfStockCount

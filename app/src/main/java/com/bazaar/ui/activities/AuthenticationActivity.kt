@@ -1,4 +1,4 @@
-package com.bazaar.ui.screens
+package com.bazaar.ui.activities
 
 import android.app.Activity
 import android.content.Intent

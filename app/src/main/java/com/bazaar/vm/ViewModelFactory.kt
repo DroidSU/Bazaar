@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bazaar.data.repository.AuthRepositoryImpl
 import com.bazaar.repository.DashboardRepositoryImpl
 import com.bazaar.repository.ProductRepositoryImpl
+import com.bazaar.repository.TransactionsRepositoryImpl
 import com.bazaar.utils.AppDatabase
 
 class ViewModelFactory(private val context : Context) : ViewModelProvider.Factory {
@@ -28,6 +29,10 @@ class ViewModelFactory(private val context : Context) : ViewModelProvider.Factor
             modelClass.isAssignableFrom(DashboardViewModel::class.java) -> {
                 val db = AppDatabase.getInstance(context)
                 DashboardViewModel(DashboardRepositoryImpl(db.productDao())) as T
+            }
+            modelClass.isAssignableFrom(TransactionsViewModel::class.java) -> {
+                val db = AppDatabase.getInstance(context)
+                TransactionsViewModel(TransactionsRepositoryImpl(db.productDao())) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

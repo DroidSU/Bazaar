@@ -17,27 +17,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Bazaar">
         <activity
-            android:name=".ui.screens.DashboardActivity"
+            android:name=".ui.activities.TransactionsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_transactions"
+            android:theme="@style/Theme.Bazaar" />
+        <activity
+            android:name=".ui.activities.DashboardActivity"
             android:exported="false"
             android:label="@string/title_activity_dashboard"
             android:theme="@style/Theme.Bazaar" />
         <activity
-            android:name=".ui.screens.EditProductActivity"
+            android:name=".ui.activities.EditProductActivity"
             android:exported="false"
             android:label="@string/title_activity_edit_product"
             android:theme="@style/Theme.Bazaar" />
         <activity
-            android:name=".ui.screens.AuthenticationActivity"
+            android:name=".ui.activities.AuthenticationActivity"
             android:exported="false"
             android:label="@string/title_activity_authentication"
             android:theme="@style/Theme.Bazaar" />
         <activity
-            android:name=".ui.screens.ProductsActivity"
+            android:name=".ui.activities.ProductsActivity"
             android:exported="false"
             android:label="@string/title_activity_products"
             android:theme="@style/Theme.Bazaar" />
         <activity
-            android:name=".ui.screens.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Bazaar">
@@ -48,7 +53,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.screens.AddProductActivity"
+            android:name=".ui.activities.AddProductActivity"
             android:exported="true"
             android:theme="@style/Theme.Bazaar" />
     </application>
