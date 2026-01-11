@@ -22,6 +22,16 @@ class TransactionsViewModel(private val repository: TransactionsRepository) : Vi
     private val _selectedTabIndex = MutableStateFlow<Int>(0)
     val selectedTabIndex = _selectedTabIndex.asStateFlow()
 
+    private val _selectedSalesProduct = MutableStateFlow<Product?>(null)
+    val selectedSalesProduct = _selectedSalesProduct.asStateFlow()
+
+    private val _selectedQuantityForSales = MutableStateFlow(1)
+    val selectedQuantityForSales = _selectedQuantityForSales.asStateFlow()
+
+    private val _totalAmount = MutableStateFlow(0.0)
+    val totalAmount = _totalAmount.asStateFlow()
+
+
     init {
         getProductListFromDB()
     }
@@ -48,5 +58,20 @@ class TransactionsViewModel(private val repository: TransactionsRepository) : Vi
 
     fun onTabSelected(index: Int) {
         _selectedTabIndex.value = index
+    }
+
+    fun onSalesProductSelected(productID: String) {
+        _selectedSalesProduct.value = _productList.value.find { it.id == productID }
+        _selectedQuantityForSales.value = 1
+        getTotalAmount()
+    }
+
+    fun onSalesQuantityChanged(quantity: Int) {
+        _selectedQuantityForSales.value = quantity
+        getTotalAmount()
+    }
+
+    fun getTotalAmount() {
+        _totalAmount.value = _selectedSalesProduct.value?.price?.times(_selectedQuantityForSales.value) ?: 0.0
     }
 }

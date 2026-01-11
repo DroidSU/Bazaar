@@ -57,14 +57,14 @@ import com.bazaar.theme.BazaarTheme
 fun SalesScreen(
     productList: List<Product>,
     salesList: List<SaleItemModel>,
-    selectedProductIDForSales: String,
+    selectedProduct: Product?,
     selectedQuantityForSales: Int,
     onProductSelected: (String) -> Unit,
     onQuantityChanged: (Int) -> Unit,
     onAddToCartClicked: (Product) -> Unit,
-    onRemoveProductClicked: (Int) -> Unit
+    onRemoveProductClicked: (Int) -> Unit,
+    totalAmount: Double,
 ) {
-    val selectedProduct = if(selectedProductIDForSales.isNotEmpty()) productList.find { it.id == selectedProductIDForSales } else null
 
     Column(
         modifier = Modifier
@@ -141,7 +141,7 @@ fun SalesScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Quantity and Add Button
-                if(selectedProduct != null) {
+                if (selectedProduct != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -149,11 +149,14 @@ fun SalesScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             IconButton(onClick = {
-                                if (selectedProduct.quantity > 1) onQuantityChanged(
-                                    selectedQuantityForSales - 1
-                                )
+                                if (selectedQuantityForSales > 1) {
+                                    onQuantityChanged(selectedQuantityForSales - 1)
+                                }
                             }) {
-                                Icon(Icons.Default.RemoveCircleOutline, contentDescription = "Decrease")
+                                Icon(
+                                    Icons.Default.RemoveCircleOutline,
+                                    contentDescription = "Decrease"
+                                )
                             }
                             Text(
                                 text = selectedQuantityForSales.toString(),
@@ -161,7 +164,10 @@ fun SalesScreen(
                                 modifier = Modifier.padding(horizontal = 8.dp)
                             )
                             IconButton(onClick = { onQuantityChanged(selectedQuantityForSales + 1) }) {
-                                Icon(Icons.Default.AddCircleOutline, contentDescription = "Increase")
+                                Icon(
+                                    Icons.Default.AddCircleOutline,
+                                    contentDescription = "Increase"
+                                )
                             }
                         }
 
@@ -225,6 +231,7 @@ fun SalesScreen(
             }
         }
 
+        // bottom card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -243,7 +250,7 @@ fun SalesScreen(
                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                     )
                     Text(
-                        "₹0",
+                        "₹${totalAmount}",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -271,12 +278,13 @@ private fun SalesScreenPreview() {
         SalesScreen(
             productList = emptyList(),
             salesList = emptyList(),
-            selectedProductIDForSales = "",
+            selectedProduct = null,
             selectedQuantityForSales = 0,
             onProductSelected = {},
             onQuantityChanged = {},
             onAddToCartClicked = {},
-            onRemoveProductClicked = {}
+            onRemoveProductClicked = {},
+            totalAmount = 0.0
         )
     }
 }

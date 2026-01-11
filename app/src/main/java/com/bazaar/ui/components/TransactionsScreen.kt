@@ -26,7 +26,12 @@ import com.bazaar.theme.BazaarTheme
 fun TransactionsScreen(
     productList: List<Product>,
     selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit
+    onTabSelected: (Int) -> Unit,
+    onSalesProductSelected: (String) -> Unit,
+    selectedProduct: Product? = null,
+    selectedQuantityForSales: Int,
+    onSalesQuantityChanged: (Int) -> Unit,
+    totalAmount: Double,
 ) {
     val tabs = listOf("Sales", "Restock")
 
@@ -85,12 +90,17 @@ fun TransactionsScreen(
                 0 -> SalesScreen(
                     productList = productList,
                     salesList = emptyList(),
-                    selectedProductIDForSales = "",
-                    selectedQuantityForSales = 0,
-                    onProductSelected = {},
-                    onQuantityChanged = {},
+                    selectedProduct = selectedProduct,
+                    selectedQuantityForSales = selectedQuantityForSales,
+                    totalAmount = totalAmount,
+                    onProductSelected = {
+                        onSalesProductSelected(it)
+                    },
+                    onQuantityChanged = {
+                        onSalesQuantityChanged(it)
+                    },
                     onAddToCartClicked = {},
-                    onRemoveProductClicked = {}
+                    onRemoveProductClicked = {},
                 )
                 1 -> RestockScreen()
             }
@@ -105,7 +115,11 @@ private fun TransactionsScreenPreview() {
         TransactionsScreen(
             productList = emptyList(),
             selectedTabIndex = 0,
-            onTabSelected = {}
+            onTabSelected = {},
+            onSalesProductSelected = {},
+            selectedQuantityForSales = 0,
+            onSalesQuantityChanged = {},
+            totalAmount = 0.0
         )
     }
 }
