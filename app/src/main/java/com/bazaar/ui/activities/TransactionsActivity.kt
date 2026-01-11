@@ -23,9 +23,9 @@ class TransactionsActivity : ComponentActivity() {
                 val productList by viewModel.productList.collectAsState(emptyList())
                 val selectedTabIndex by viewModel.selectedTabIndex.collectAsState(0)
                 val selectedSalesProduct by viewModel.selectedSalesProduct.collectAsState(null)
-                // initial value for selectedQuantityForSales will be 1 as we want the count to start from 1.
-                val selectedQuantityForSales by viewModel.selectedQuantityForSales.collectAsState(1)
+                val selectedQuantityForSales by viewModel.selectedQuantityForSales.collectAsState(0)
                 val totalAmount by viewModel.totalAmount.collectAsState(0.0)
+                val salesList by viewModel.salesList.collectAsState(emptyList())
 
                 TransactionsScreen(
                     productList = productList,
@@ -41,7 +41,11 @@ class TransactionsActivity : ComponentActivity() {
                     onSalesQuantityChanged = {
                         viewModel.onSalesQuantityChanged(it)
                     },
-                    totalAmount = totalAmount
+                    onAddToCartClicked = {
+                        viewModel.onAddToCart()
+                    },
+                    totalAmount = totalAmount,
+                    salesList = salesList
                 )
             }
         }

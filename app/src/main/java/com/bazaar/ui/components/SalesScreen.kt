@@ -60,8 +60,8 @@ fun SalesScreen(
     selectedProduct: Product?,
     selectedQuantityForSales: Int,
     onProductSelected: (String) -> Unit,
-    onQuantityChanged: (Int) -> Unit,
-    onAddToCartClicked: (Product) -> Unit,
+    onQuantityChanged: (Boolean) -> Unit,
+    onAddToCartClicked: () -> Unit,
     onRemoveProductClicked: (Int) -> Unit,
     totalAmount: Double,
 ) {
@@ -150,7 +150,7 @@ fun SalesScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             IconButton(onClick = {
                                 if (selectedQuantityForSales > 1) {
-                                    onQuantityChanged(selectedQuantityForSales - 1)
+                                    onQuantityChanged(true)
                                 }
                             }) {
                                 Icon(
@@ -163,7 +163,7 @@ fun SalesScreen(
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.padding(horizontal = 8.dp)
                             )
-                            IconButton(onClick = { onQuantityChanged(selectedQuantityForSales + 1) }) {
+                            IconButton(onClick = { onQuantityChanged(false) }) {
                                 Icon(
                                     Icons.Default.AddCircleOutline,
                                     contentDescription = "Increase"
@@ -173,7 +173,7 @@ fun SalesScreen(
 
                         Button(
                             onClick = {
-                                onAddToCartClicked(selectedProduct)
+                                onAddToCartClicked()
                             },
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -200,7 +200,7 @@ fun SalesScreen(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(salesList.size) { id ->
+            items(count = salesList.size, key = { index -> salesList[index].id }) { id ->
                 ListItem(
                     headlineContent = {
                         Text(
@@ -213,7 +213,8 @@ fun SalesScreen(
                         val weight = salesList[id].weight
                         val displayValue = if (quantity != 0) quantity else weight
 
-                        Text("Qty: $displayValue × ₹${salesList[id].totalPrice}")
+                        val productPrice = productList.find { salesList[id].productId == it.id }?.price
+                        Text("Qty: $displayValue × ₹$productPrice")
                     },
                     trailingContent = {
                         IconButton(onClick = { onRemoveProductClicked(id) }) {

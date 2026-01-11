@@ -25,7 +25,7 @@ class TransactionsViewModel(private val repository: TransactionsRepository) : Vi
     private val _selectedSalesProduct = MutableStateFlow<Product?>(null)
     val selectedSalesProduct = _selectedSalesProduct.asStateFlow()
 
-    private val _selectedQuantityForSales = MutableStateFlow(1)
+    private val _selectedQuantityForSales = MutableStateFlow(0)
     val selectedQuantityForSales = _selectedQuantityForSales.asStateFlow()
 
     private val _totalAmount = MutableStateFlow(0.0)
@@ -62,16 +62,32 @@ class TransactionsViewModel(private val repository: TransactionsRepository) : Vi
 
     fun onSalesProductSelected(productID: String) {
         _selectedSalesProduct.value = _productList.value.find { it.id == productID }
-        _selectedQuantityForSales.value = 1
-        getTotalAmount()
+        _selectedQuantityForSales.value = 0
     }
 
-    fun onSalesQuantityChanged(quantity: Int) {
-        _selectedQuantityForSales.value = quantity
-        getTotalAmount()
+    fun onSalesQuantityChanged(isNegative: Boolean) {
+        if(isNegative){
+            _selectedQuantityForSales.value -= 1
+        }
+        else{
+            _selectedQuantityForSales.value += 1
+        }
     }
 
-    fun getTotalAmount() {
-        _totalAmount.value = _selectedSalesProduct.value?.price?.times(_selectedQuantityForSales.value) ?: 0.0
+    fun onAddToCart() {
+        _totalAmount.value += (_selectedSalesProduct.value?.price ?: 0.0) * _selectedQuantityForSales.value
+
+        val saleItemModel = SaleItemModel(
+            id = "SALE_${System.currentTimeMillis()}",
+            productId = _selectedSalesProduct.value?.id ?: "",
+            productName = _selectedSalesProduct.value?.name ?: "",
+            quantity = _selectedQuantityForSales.value,
+            weight = _selectedSalesProduct.value?.weight ?: 0.0,
+            totalPrice = _selectedSalesProduct.value?.price?.times(_selectedQuantityForSales.value) ?: 0.0
+        )
+        _salesList.value += saleItemModel
+
+        _selectedSalesProduct.value = null
+        _selectedQuantityForSales.value = 0
     }
 }

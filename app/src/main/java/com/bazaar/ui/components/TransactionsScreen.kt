@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bazaar.models.Product
+import com.bazaar.models.SaleItemModel
 import com.bazaar.theme.BazaarTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,8 +31,10 @@ fun TransactionsScreen(
     onSalesProductSelected: (String) -> Unit,
     selectedProduct: Product? = null,
     selectedQuantityForSales: Int,
-    onSalesQuantityChanged: (Int) -> Unit,
+    onSalesQuantityChanged: (Boolean) -> Unit,
+    salesList: List<SaleItemModel>,
     totalAmount: Double,
+    onAddToCartClicked: () -> Unit = {},
 ) {
     val tabs = listOf("Sales", "Restock")
 
@@ -89,7 +92,7 @@ fun TransactionsScreen(
             when (selectedTabIndex) {
                 0 -> SalesScreen(
                     productList = productList,
-                    salesList = emptyList(),
+                    salesList = salesList,
                     selectedProduct = selectedProduct,
                     selectedQuantityForSales = selectedQuantityForSales,
                     totalAmount = totalAmount,
@@ -99,7 +102,9 @@ fun TransactionsScreen(
                     onQuantityChanged = {
                         onSalesQuantityChanged(it)
                     },
-                    onAddToCartClicked = {},
+                    onAddToCartClicked = {
+                        onAddToCartClicked()
+                    },
                     onRemoveProductClicked = {},
                 )
                 1 -> RestockScreen()
@@ -119,7 +124,8 @@ private fun TransactionsScreenPreview() {
             onSalesProductSelected = {},
             selectedQuantityForSales = 0,
             onSalesQuantityChanged = {},
-            totalAmount = 0.0
+            totalAmount = 0.0,
+            salesList = emptyList()
         )
     }
 }
