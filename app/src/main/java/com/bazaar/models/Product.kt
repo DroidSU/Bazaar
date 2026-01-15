@@ -6,7 +6,7 @@ import com.bazaar.utils.ConstantsManager
 import com.bazaar.utils.WeightUnit
 import com.google.firebase.firestore.PropertyName
 
-@Entity(ConstantsManager.COLLECTION_PRODUCTS)
+@Entity(ConstantsManager.TABLE_PRODUCTS)
 data class Product(
     @PrimaryKey @get:PropertyName("id") @set:PropertyName("id") var id: String = "",
     @get:PropertyName("name") @set:PropertyName("name") var name: String = "",

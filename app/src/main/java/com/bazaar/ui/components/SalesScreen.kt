@@ -63,6 +63,7 @@ fun SalesScreen(
     onQuantityChanged: (Boolean) -> Unit,
     onAddToCartClicked: () -> Unit,
     onRemoveProductClicked: (Int) -> Unit,
+    onCheckout: () -> Unit,
     totalAmount: Double,
 ) {
 

@@ -34,7 +34,8 @@ fun TransactionsScreen(
     onSalesQuantityChanged: (Boolean) -> Unit,
     salesList: List<SaleItemModel>,
     totalAmount: Double,
-    onAddToCartClicked: () -> Unit = {},
+    onAddToCartClicked: () -> Unit,
+    onCheckout: () -> Unit,
 ) {
     val tabs = listOf("Sales", "Restock")
 
@@ -106,6 +107,9 @@ fun TransactionsScreen(
                         onAddToCartClicked()
                     },
                     onRemoveProductClicked = {},
+                    onCheckout = {
+                        onCheckout()
+                    },
                 )
                 1 -> RestockScreen()
             }
@@ -125,7 +129,9 @@ private fun TransactionsScreenPreview() {
             selectedQuantityForSales = 0,
             onSalesQuantityChanged = {},
             totalAmount = 0.0,
-            salesList = emptyList()
+            salesList = emptyList(),
+            onCheckout = {},
+            onAddToCartClicked = {}
         )
     }
 }

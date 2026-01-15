@@ -45,7 +45,10 @@ class TransactionsActivity : ComponentActivity() {
                         viewModel.onAddToCart()
                     },
                     totalAmount = totalAmount,
-                    salesList = salesList
+                    salesList = salesList,
+                    onCheckout = {
+                        viewModel.onCheckout()
+                    }
                 )
             }
         }

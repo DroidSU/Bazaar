@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductsDAO {
-    @Query("SELECT * FROM ${ConstantsManager.COLLECTION_PRODUCTS}")
+    @Query("SELECT * FROM ${ConstantsManager.TABLE_PRODUCTS}")
     fun getAllProducts(): Flow<List<Product>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -1,7 +1,6 @@
 package com.bazaar.models
 
 data class SaleItemModel(
-    val id: String,
     val productId: String,
     val productName: String,
     val totalPrice: Double,

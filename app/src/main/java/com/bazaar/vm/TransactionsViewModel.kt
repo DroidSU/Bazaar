@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class TransactionsViewModel(private val repository: TransactionsRepository) : ViewModel() {
+class TransactionsViewModel(private val repository: TransactionsRepository, private val ) : ViewModel() {
     private val _salesList = MutableStateFlow<List<SaleItemModel>>(emptyList())
     val salesList = _salesList.asStateFlow()
 
@@ -78,7 +78,6 @@ class TransactionsViewModel(private val repository: TransactionsRepository) : Vi
         _totalAmount.value += (_selectedSalesProduct.value?.price ?: 0.0) * _selectedQuantityForSales.value
 
         val saleItemModel = SaleItemModel(
-            id = "SALE_${System.currentTimeMillis()}",
             productId = _selectedSalesProduct.value?.id ?: "",
             productName = _selectedSalesProduct.value?.name ?: "",
             quantity = _selectedQuantityForSales.value,
@@ -89,5 +88,9 @@ class TransactionsViewModel(private val repository: TransactionsRepository) : Vi
 
         _selectedSalesProduct.value = null
         _selectedQuantityForSales.value = 0
+    }
+
+    fun onCheckout() {
+
     }
 }
