@@ -48,7 +48,11 @@ class TransactionsActivity : ComponentActivity() {
                     salesList = salesList,
                     onCheckout = {
                         viewModel.onCheckout()
-                    }
+                    },
+                    onRemoveItem = {
+                        viewModel.onRemoveItem(it)
+                    },
+                    checkoutSuccessFlow = viewModel.checkoutState
                 )
             }
         }

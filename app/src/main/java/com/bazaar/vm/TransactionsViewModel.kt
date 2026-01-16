@@ -4,13 +4,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bazaar.dao.TransactionsDAO
+import com.bazaar.models.CheckoutState
 import com.bazaar.models.Product
 import com.bazaar.models.SaleItemModel
 import com.bazaar.models.Transactions
 import com.bazaar.repository.TransactionsRepository
 import com.bazaar.utils.ConstantsManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -33,6 +36,8 @@ class TransactionsViewModel(private val repository: TransactionsRepository, priv
     private val _totalAmount = MutableStateFlow(0.0)
     val totalAmount = _totalAmount.asStateFlow()
 
+    private val _checkoutState = MutableSharedFlow<CheckoutState>()
+    val checkoutState = _checkoutState.asSharedFlow()
 
     init {
         getProductListFromDB()
@@ -84,7 +89,8 @@ class TransactionsViewModel(private val repository: TransactionsRepository, priv
             productName = _selectedSalesProduct.value?.name ?: "",
             quantity = _selectedQuantityForSales.value,
             weight = _selectedSalesProduct.value?.weight ?: 0.0,
-            totalPrice = _selectedSalesProduct.value?.price?.times(_selectedQuantityForSales.value) ?: 0.0
+            totalPrice = _selectedSalesProduct.value?.price?.times(_selectedQuantityForSales.value) ?: 0.0,
+            createdOn = System.currentTimeMillis()
         )
         _salesList.value += saleItemModel
 
@@ -104,10 +110,21 @@ class TransactionsViewModel(private val repository: TransactionsRepository, priv
                 _salesList.value = emptyList()
                 _totalAmount.value = 0.0
                 Log.d(ConstantsManager.APP_TAG, "onCheckout: Transaction added successfully")
+                _checkoutState.emit(CheckoutState.Success)
             }
             catch(e: Exception) {
                 Log.e(ConstantsManager.APP_TAG, "onCheckout: Error adding transaction")
+                _checkoutState.emit(CheckoutState.Error("Error adding transaction"))
             }
+        }
+    }
+
+    fun onRemoveItem(index: Int) {
+        val currentList = _salesList.value.toMutableList()
+        if(index in currentList.indices){
+            val itemToRemove = currentList.removeAt(index)
+            _totalAmount.value -= itemToRemove.totalPrice
+            _salesList.value = currentList
         }
     }
 }

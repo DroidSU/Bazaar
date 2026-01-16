@@ -18,9 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.bazaar.models.CheckoutState
 import com.bazaar.models.Product
 import com.bazaar.models.SaleItemModel
 import com.bazaar.theme.BazaarTheme
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +39,8 @@ fun TransactionsScreen(
     totalAmount: Double,
     onAddToCartClicked: () -> Unit,
     onCheckout: () -> Unit,
+    onRemoveItem: (Int) -> Unit,
+    checkoutSuccessFlow: SharedFlow<CheckoutState>
 ) {
     val tabs = listOf("Sales", "Restock")
 
@@ -106,11 +111,15 @@ fun TransactionsScreen(
                     onAddToCartClicked = {
                         onAddToCartClicked()
                     },
-                    onRemoveProductClicked = {},
+                    onRemoveProductClicked = {
+                        onRemoveItem(it)
+                    },
                     onCheckout = {
                         onCheckout()
                     },
+                    checkoutStateFlow = checkoutSuccessFlow
                 )
+
                 1 -> RestockScreen()
             }
         }
@@ -131,7 +140,9 @@ private fun TransactionsScreenPreview() {
             totalAmount = 0.0,
             salesList = emptyList(),
             onCheckout = {},
-            onAddToCartClicked = {}
+            onAddToCartClicked = {},
+            onRemoveItem = {},
+            checkoutSuccessFlow = MutableSharedFlow()
         )
     }
 }

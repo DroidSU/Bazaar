@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,12 +45,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.bazaar.R
+import com.bazaar.models.CheckoutState
 import com.bazaar.models.Product
 import com.bazaar.models.SaleItemModel
 import com.bazaar.theme.BazaarTheme
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +71,22 @@ fun SalesScreen(
     onRemoveProductClicked: (Int) -> Unit,
     onCheckout: () -> Unit,
     totalAmount: Double,
+    checkoutStateFlow: SharedFlow<CheckoutState>,
 ) {
+
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(checkoutStateFlow) {
+        checkoutStateFlow.collect {
+            showSuccessDialog = it is CheckoutState.Success
+        }
+    }
+
+    if (showSuccessDialog) {
+        SuccessDialog {
+            showSuccessDialog = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -112,7 +133,7 @@ fun SalesScreen(
                             onDismissRequest = { expanded = false }) {
                             productList.forEach { product ->
                                 DropdownMenuItem(
-                                    text = { Text(product.name ) },
+                                    text = { Text(product.name) },
                                     onClick = {
                                         onProductSelected(product.id)
                                         expanded = false
@@ -176,11 +197,12 @@ fun SalesScreen(
                             onClick = {
                                 onAddToCartClicked()
                             },
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = selectedQuantityForSales > 0
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Add to Cart")
+                            Text(stringResource(R.string.add_to_cart))
                         }
                     }
                 }
@@ -201,24 +223,25 @@ fun SalesScreen(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(count = salesList.size, key = { index -> salesList[index] }) { id ->
+            items(count = salesList.size, key = { key -> key }) { index ->
                 ListItem(
                     headlineContent = {
                         Text(
-                            salesList[id].productName,
+                            salesList[index].productName,
                             fontWeight = FontWeight.SemiBold
                         )
                     },
                     supportingContent = {
-                        val quantity = salesList[id].quantity
-                        val weight = salesList[id].weight
+                        val quantity = salesList[index].quantity
+                        val weight = salesList[index].weight
                         val displayValue = if (quantity != 0) quantity else weight
 
-                        val productPrice = productList.find { salesList[id].productId == it.id }?.price
+                        val productPrice =
+                            productList.find { salesList[index].productId == it.id }?.price
                         Text("Qty: $displayValue × ₹$productPrice")
                     },
                     trailingContent = {
-                        IconButton(onClick = { onRemoveProductClicked(id) }) {
+                        IconButton(onClick = { onRemoveProductClicked(index) }) {
                             Icon(
                                 Icons.Default.DeleteOutline,
                                 contentDescription = "Remove",
@@ -289,7 +312,8 @@ private fun SalesScreenPreview() {
             onAddToCartClicked = {},
             onRemoveProductClicked = {},
             totalAmount = 0.0,
-            onCheckout = {}
+            onCheckout = {},
+            checkoutStateFlow = MutableSharedFlow()
         )
     }
 }
