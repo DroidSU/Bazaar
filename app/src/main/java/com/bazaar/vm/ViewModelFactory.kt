@@ -32,7 +32,7 @@ class ViewModelFactory(private val context : Context) : ViewModelProvider.Factor
             }
             modelClass.isAssignableFrom(TransactionsViewModel::class.java) -> {
                 val db = AppDatabase.getInstance(context)
-                TransactionsViewModel(TransactionsRepositoryImpl(db.productDao())) as T
+                TransactionsViewModel(TransactionsRepositoryImpl(db.productDao()), db.transactionsDAO()) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

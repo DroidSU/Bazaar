@@ -112,7 +112,7 @@ fun SalesScreen(
                             onDismissRequest = { expanded = false }) {
                             productList.forEach { product ->
                                 DropdownMenuItem(
-                                    text = { Text(product.name) },
+                                    text = { Text(product.name ) },
                                     onClick = {
                                         onProductSelected(product.id)
                                         expanded = false
@@ -201,7 +201,7 @@ fun SalesScreen(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(count = salesList.size, key = { index -> salesList[index].id }) { id ->
+            items(count = salesList.size, key = { index -> salesList[index] }) { id ->
                 ListItem(
                     headlineContent = {
                         Text(
@@ -259,7 +259,9 @@ fun SalesScreen(
                     )
                 }
                 Button(
-                    onClick = { /* Handle Checkout */ },
+                    onClick = {
+                        onCheckout()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
                         contentColor = MaterialTheme.colorScheme.primary
@@ -286,7 +288,8 @@ private fun SalesScreenPreview() {
             onQuantityChanged = {},
             onAddToCartClicked = {},
             onRemoveProductClicked = {},
-            totalAmount = 0.0
+            totalAmount = 0.0,
+            onCheckout = {}
         )
     }
 }
