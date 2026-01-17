@@ -56,8 +56,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bazaar.models.Product
 import com.bazaar.repository.EditProductsUiState
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.utils.WeightUnit
+import com.sujoy.designsystem.components.PriceField
+import com.sujoy.designsystem.theme.BazaarTheme
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -201,7 +202,12 @@ fun EditProductScreen(
                                     price = it
                                 },
                                 modifier = Modifier.height(56.dp),
-                                enabled = !isBusy
+                                enabled = !isBusy,
+                                currencySymbol = "₹",
+                                placeholder = "0.0",
+                                isValid = {
+                                    it.matches(Regex("^\\d*\\.?\\d{0,2}$"))
+                                }
                             )
                         }
 

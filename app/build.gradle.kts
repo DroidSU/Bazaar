@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.room.ktx) // For coroutines support (suspend functions)
     ksp(libs.androidx.room.compiler)
     implementation(libs.google.code.gson)
+    implementation(project(":core:designsystem"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

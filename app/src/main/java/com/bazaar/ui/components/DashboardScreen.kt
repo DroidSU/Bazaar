@@ -49,14 +49,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bazaar.models.Product
-import com.bazaar.theme.BazaarTheme
-import com.bazaar.theme.md_dashboard_low_stock_background_dark
-import com.bazaar.theme.md_dashboard_low_stock_background_light
-import com.bazaar.theme.md_dashboard_low_stock_icon_dark
-import com.bazaar.theme.md_dashboard_low_stock_icon_light
-import com.bazaar.theme.md_dashboard_out_of_stock_background_dark
-import com.bazaar.theme.md_dashboard_out_of_stock_background_light
-import com.bazaar.theme.md_dashboard_out_of_stock_icon_light
+import com.sujoy.designsystem.theme.BazaarTheme
+import com.sujoy.designsystem.theme.md_dashboard_low_stock_background_dark
+import com.sujoy.designsystem.theme.md_dashboard_low_stock_background_light
+import com.sujoy.designsystem.theme.md_dashboard_low_stock_icon_dark
+import com.sujoy.designsystem.theme.md_dashboard_low_stock_icon_light
+import com.sujoy.designsystem.theme.md_dashboard_out_of_stock_background_dark
+import com.sujoy.designsystem.theme.md_dashboard_out_of_stock_background_light
+import com.sujoy.designsystem.theme.md_dashboard_out_of_stock_icon_light
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

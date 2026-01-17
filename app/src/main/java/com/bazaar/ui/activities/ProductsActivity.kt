@@ -9,10 +9,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import com.bazaar.repository.ProductsUiState
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.ProductScreen
 import com.bazaar.vm.ProductsActivityViewModel
 import com.bazaar.vm.ViewModelFactory
+import com.sujoy.designsystem.theme.BazaarTheme
 
 class ProductsActivity : ComponentActivity() {
 

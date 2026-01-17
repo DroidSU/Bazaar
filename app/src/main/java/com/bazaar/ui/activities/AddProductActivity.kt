@@ -38,15 +38,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.AdaptiveThresholdView
 import com.bazaar.ui.components.NeumorphicTextField
-import com.bazaar.ui.components.PriceField
 import com.bazaar.ui.components.QuantitySelector
 import com.bazaar.ui.components.WeightInput
 import com.bazaar.utils.WeightUnit
 import com.bazaar.vm.AddProductViewModel
 import com.bazaar.vm.ViewModelFactory
+import com.sujoy.designsystem.components.PriceField
+import com.sujoy.designsystem.theme.BazaarTheme
 
 class AddProductActivity : ComponentActivity() {
 
@@ -202,7 +202,13 @@ private fun AddProductScreen(
                     PriceField(
                         value = productPrice,
                         onValueChange = onPriceChange,
-                        modifier = Modifier.height(56.dp)
+                        modifier = Modifier.height(56.dp),
+                        currencySymbol = "₹",
+                        placeholder = "0.0",
+                        enabled = true,
+                        isValid = {
+                            it.matches(Regex("^\\d*\\.?\\d{0,2}$"))
+                        }
                     )
                 }
 

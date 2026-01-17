@@ -1,4 +1,4 @@
-package com.bazaar.theme
+package com.sujoy.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

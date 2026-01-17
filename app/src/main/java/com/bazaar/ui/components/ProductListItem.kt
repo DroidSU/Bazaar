@@ -33,7 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bazaar.models.Product
-import com.bazaar.theme.BazaarTheme
+import com.sujoy.designsystem.components.CornerRibbon
+import com.sujoy.designsystem.theme.BazaarTheme
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -201,8 +202,11 @@ fun ProductContent(product: Product, onEditClick: (Product) -> Unit) {
             }
 
             if(product.quantity < product.thresholdValue) {
-                LowStockIndicator(
-                    modifier = Modifier.align(Alignment.TopEnd)
+                CornerRibbon(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    containerSize = 50,
+                    ribbonColor = MaterialTheme.colorScheme.error,
+                    iconColor = MaterialTheme.colorScheme.onError
                 )
             }
         }
@@ -217,11 +221,12 @@ private fun ProductListItemPreview() {
         Product(
             id = "0",
             name = "Premium Wireless Headphones with Extra Bass",
-            quantity = 15,
+            quantity = 4,
             price = 249.99,
             weight = 500.0,
             weightUnit = "gm",
-            createdOn = System.currentTimeMillis()
+            createdOn = System.currentTimeMillis(),
+            thresholdValue = 5.0
         )
     BazaarTheme {
         ProductListItem(

@@ -35,7 +35,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bazaar.theme.BazaarTheme
+import com.sujoy.designsystem.theme.BazaarTheme
 
 // Data class to define the smaller action buttons
 data class FabAction(

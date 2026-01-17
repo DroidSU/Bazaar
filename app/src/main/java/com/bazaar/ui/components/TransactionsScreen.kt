@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.bazaar.models.CheckoutState
 import com.bazaar.models.Product
 import com.bazaar.models.SaleItemModel
-import com.bazaar.theme.BazaarTheme
+import com.sujoy.designsystem.theme.BazaarTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 

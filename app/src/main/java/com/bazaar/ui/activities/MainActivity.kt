@@ -23,8 +23,8 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
-import com.bazaar.theme.BazaarTheme
 import com.google.firebase.auth.FirebaseAuth
+import com.sujoy.designsystem.theme.BazaarTheme
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {

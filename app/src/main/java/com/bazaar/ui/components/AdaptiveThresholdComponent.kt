@@ -27,8 +27,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.utils.WeightUnit
+import com.sujoy.designsystem.theme.BazaarTheme
 
 @Composable
 fun AdaptiveThresholdView(

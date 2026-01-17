@@ -1,6 +1,7 @@
-package com.bazaar.theme
+package com.sujoy.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
+
 
 // --- Universal Colors ---
 val White = Color(0xFFFFFFFF)

@@ -7,11 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import com.bazaar.models.Product
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.EditProductScreen
 import com.bazaar.utils.WeightUnit
 import com.bazaar.vm.EditProductsViewModel
 import com.bazaar.vm.ViewModelFactory
+import com.sujoy.designsystem.theme.BazaarTheme
 
 class EditProductActivity : ComponentActivity() {
 

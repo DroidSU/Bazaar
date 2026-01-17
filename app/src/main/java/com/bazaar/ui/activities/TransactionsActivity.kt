@@ -7,10 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.TransactionsScreen
 import com.bazaar.vm.TransactionsViewModel
 import com.bazaar.vm.ViewModelFactory
+import com.sujoy.designsystem.theme.BazaarTheme
 
 class TransactionsActivity : ComponentActivity() {
     private val viewModel: TransactionsViewModel by viewModels { ViewModelFactory(applicationContext) }

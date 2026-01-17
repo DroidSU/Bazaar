@@ -1,4 +1,4 @@
-package com.bazaar.ui.components
+package com.sujoy.designsystem.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -23,24 +23,23 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bazaar.theme.BazaarTheme
-import java.text.NumberFormat
-import java.util.Locale
+import com.sujoy.designsystem.theme.BazaarTheme
 
 @Composable
 fun PriceField(
     value: String,
     onValueChange: (String) -> Unit,
+    currencySymbol: String,
     modifier: Modifier = Modifier,
+    placeholder: String = "",
     enabled: Boolean = true,
+    isValid: (String) -> Boolean = { true }
 ) {
-    val currencySymbol = NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: "$"
 
     BasicTextField(
         value = value,
         onValueChange = { newValue ->
-            // Allow only numbers and a single decimal point
-            if (newValue.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+            if (isValid(newValue)) {
                 onValueChange(newValue)
             }
         },
@@ -76,7 +75,7 @@ fun PriceField(
                 Box(modifier = Modifier.padding(start = 8.dp)) {
                     if (value.isEmpty()) {
                         Text(
-                            text = "0.00",
+                            text = placeholder,
                             fontSize = 24.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
@@ -92,14 +91,12 @@ fun PriceField(
 @Composable
 private fun PriceFieldPreview() {
     BazaarTheme {
-        PriceField(value = "129.99", onValueChange = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PriceFieldEmptyPreview() {
-    BazaarTheme {
-        PriceField(value = "", onValueChange = {})
+        PriceField(
+            value = "129.99",
+            onValueChange = {},
+            currencySymbol = "₹",
+            placeholder = "0.0",
+            enabled = true,
+            isValid = { true })
     }
 }

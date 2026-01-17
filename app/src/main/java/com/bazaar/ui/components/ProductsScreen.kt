@@ -62,10 +62,10 @@ import com.bazaar.R
 import com.bazaar.models.Product
 import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductsUiState
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.activities.EditProductActivity
 import com.bazaar.utils.SortOption
 import com.bazaar.utils.WeightUnit
+import com.sujoy.designsystem.theme.BazaarTheme
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)

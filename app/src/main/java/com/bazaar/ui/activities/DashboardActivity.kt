@@ -10,10 +10,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.bazaar.models.Product
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.DashboardScreen
 import com.bazaar.vm.DashboardViewModel
 import com.bazaar.vm.ViewModelFactory
+import com.sujoy.designsystem.theme.BazaarTheme
 
 class DashboardActivity : ComponentActivity() {
     private val viewModel: DashboardViewModel by viewModels { ViewModelFactory(applicationContext) }

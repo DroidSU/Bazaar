@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Bazaar"
 include(":app")
+include(":core:designsystem")

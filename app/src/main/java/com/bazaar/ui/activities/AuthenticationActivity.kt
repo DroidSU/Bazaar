@@ -45,7 +45,6 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
 import com.bazaar.models.AuthUiState
-import com.bazaar.theme.BazaarTheme
 import com.bazaar.ui.components.LoginOptionsView
 import com.bazaar.ui.components.OtpEntryView
 import com.bazaar.vm.AuthViewModel
@@ -55,6 +54,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.sujoy.designsystem.theme.BazaarTheme
 
 private const val TAG = "AuthenticationActivity"
 
