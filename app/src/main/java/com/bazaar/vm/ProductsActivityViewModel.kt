@@ -10,7 +10,7 @@ import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductRepository
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.utils.SortOption
-import com.bazaar.utils.WeightUnit
+import com.sujoy.designsystem.utils.WeightUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

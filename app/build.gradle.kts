@@ -63,6 +63,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.google.code.gson)
     implementation(project(":core:designsystem"))
+    implementation(project(":core:authentication"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

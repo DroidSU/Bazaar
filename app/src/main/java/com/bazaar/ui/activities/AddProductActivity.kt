@@ -38,15 +38,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bazaar.ui.components.AdaptiveThresholdView
-import com.bazaar.ui.components.NeumorphicTextField
 import com.bazaar.ui.components.QuantitySelector
-import com.bazaar.ui.components.WeightInput
-import com.bazaar.utils.WeightUnit
 import com.bazaar.vm.AddProductViewModel
 import com.bazaar.vm.ViewModelFactory
+import com.sujoy.designsystem.components.AdaptiveThresholdView
+import com.sujoy.designsystem.components.NeumorphicTextField
 import com.sujoy.designsystem.components.PriceField
+import com.sujoy.designsystem.components.WeightInput
 import com.sujoy.designsystem.theme.BazaarTheme
+import com.sujoy.designsystem.utils.WeightUnit
 
 class AddProductActivity : ComponentActivity() {
 
@@ -217,7 +217,8 @@ private fun AddProductScreen(
                     productWeight = productWeight.toDoubleOrNull() ?: 0.0,
                     weightUnit = weightUnit,
                     threshold = threshold,
-                    onThresholdChanged = onThresholdChanged
+                    onThresholdChanged = onThresholdChanged,
+                    enabled = true,
                 )
             }
 

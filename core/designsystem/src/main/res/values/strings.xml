@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Bazaar</string>
+    <string name="title_activity_products">ProductsActivity</string>
+    <string name="title_activity_edit_product_details">EditProductDetailsActivity</string>
+    <string name="title_activity_authentication">AuthenticationActivity</string>
+    <string name="title_activity_edit_product">EditProductActivity</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="title_activity_transactions">TransactionsActivity</string>
+    <string name="add_to_cart">Add to Cart</string>
+</resources>

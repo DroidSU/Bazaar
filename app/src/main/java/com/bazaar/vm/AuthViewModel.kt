@@ -4,13 +4,13 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bazaar.models.AuthUiState
-import com.bazaar.repository.AuthRepository
-import com.bazaar.utils.AuthResult
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
+import com.sujoy.authentication.data.AuthUiState
+import com.sujoy.authentication.repository.AuthRepository
+import com.sujoy.authentication.repository.AuthResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -53,6 +53,7 @@ import com.bazaar.R
 import com.bazaar.models.CheckoutState
 import com.bazaar.models.Product
 import com.bazaar.models.SaleItemModel
+import com.sujoy.designsystem.components.SuccessDialog
 import com.sujoy.designsystem.theme.BazaarTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -83,7 +84,7 @@ fun SalesScreen(
     }
 
     if (showSuccessDialog) {
-        SuccessDialog {
+        SuccessDialog(R.raw.anim_success) {
             showSuccessDialog = false
         }
     }

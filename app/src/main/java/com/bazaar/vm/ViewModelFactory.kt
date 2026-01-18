@@ -3,11 +3,11 @@ package com.bazaar.vm
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.bazaar.data.repository.AuthRepositoryImpl
 import com.bazaar.repository.DashboardRepositoryImpl
 import com.bazaar.repository.ProductRepositoryImpl
 import com.bazaar.repository.TransactionsRepositoryImpl
 import com.bazaar.utils.AppDatabase
+import com.sujoy.authentication.data.AuthRepositoryImpl
 
 class ViewModelFactory(private val context : Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")

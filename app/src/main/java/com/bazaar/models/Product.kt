@@ -3,8 +3,8 @@ package com.bazaar.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.bazaar.utils.ConstantsManager
-import com.bazaar.utils.WeightUnit
 import com.google.firebase.firestore.PropertyName
+import com.sujoy.designsystem.utils.WeightUnit
 
 @Entity(ConstantsManager.TABLE_PRODUCTS)
 data class Product(
