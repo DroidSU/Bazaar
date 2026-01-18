@@ -7,4 +7,5 @@
     <string name="title_activity_dashboard">DashboardActivity</string>
     <string name="title_activity_transactions">TransactionsActivity</string>
     <string name="add_to_cart">Add to Cart</string>
+    <string name="default_web_client_id">""</string>
 </resources>

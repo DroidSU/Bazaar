@@ -12,8 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.bazaar.R
-import com.bazaar.vm.AuthViewModel
 import com.bazaar.vm.ViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -21,7 +19,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.sujoy.authentication.ui.AuthenticationScreen
+import com.sujoy.authentication.vm.AuthViewModel
 import com.sujoy.designsystem.theme.BazaarTheme
+import com.sujoy.designsystem.R as DesignR
 
 private const val TAG = "AuthenticationActivity"
 
@@ -29,7 +29,7 @@ class AuthenticationActivity : ComponentActivity() {
 
     private val googleSignInClient: GoogleSignInClient by lazy {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestIdToken(getString(DesignR.string.default_web_client_id))
             .requestEmail()
             .build()
         GoogleSignIn.getClient(this, gso)

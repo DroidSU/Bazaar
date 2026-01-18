@@ -1,4 +1,4 @@
-package com.bazaar.vm
+package com.sujoy.authentication.vm
 
 import android.app.Activity
 import android.util.Log

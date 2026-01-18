@@ -8,6 +8,7 @@ import com.bazaar.repository.ProductRepositoryImpl
 import com.bazaar.repository.TransactionsRepositoryImpl
 import com.bazaar.utils.AppDatabase
 import com.sujoy.authentication.data.AuthRepositoryImpl
+import com.sujoy.authentication.vm.AuthViewModel
 
 class ViewModelFactory(private val context : Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
