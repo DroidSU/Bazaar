@@ -1,21 +1,16 @@
 package com.sujoy.authentication.vm
 
-import android.app.Activity
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.FirebaseException
 import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthProvider
 import com.sujoy.authentication.data.AuthUiState
 import com.sujoy.authentication.repository.AuthRepository
 import com.sujoy.authentication.repository.AuthResult
+import com.sujoy.authentication.repository.PhoneAuthEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "AuthViewModel"
@@ -25,8 +20,20 @@ class AuthViewModel(
     private val repository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AuthUiState())
+    private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState = _uiState.asStateFlow()
+
+    private val _verificationId = MutableStateFlow("")
+    val verificationId = _verificationId.asStateFlow()
+
+    private val _timerValue = MutableStateFlow(RESEND_TIMEOUT)
+    val timerValue = _timerValue.asStateFlow()
+
+    private val _isOTPSent = MutableStateFlow(false)
+    val isOTPSent = _isOTPSent.asStateFlow()
+
+    private val _otpValue = MutableStateFlow("")
+    val otpValue = _otpValue.asStateFlow()
 
     private var resendTimerJob: Job? = null
 
@@ -36,80 +43,69 @@ class AuthViewModel(
      */
     fun signInWithCredential(credential: AuthCredential) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.value = AuthUiState.Loading
 
             repository.signInWithCredentials(credential).collect { result ->
                 when (result) {
                     is AuthResult.Success -> {
-                        Log.d(TAG, "Authentication successful.")
-                        _uiState.update {
-                            it.copy(isLoading = false, isAuthSuccessful = true)
-                        }
+                        _verificationId.value = ""
+                        _isOTPSent.value = false
+                        _uiState.value = AuthUiState.Success
                     }
 
                     is AuthResult.Failure -> {
-                        Log.w(TAG, "Authentication error: ${result.message}")
-                        _uiState.update {
-                            it.copy(isLoading = false, error = result.message)
-                        }
+                        _uiState.value = AuthUiState.Error(result.message)
                     }
                 }
             }
         }
     }
 
-    /**
-     * Kicks off the phone number verification process by sending an OTP.
-     */
-    fun sendOtp(activity: Activity, phoneNumber: String) {
-        _uiState.update { it.copy(isLoading = true, error = null) }
+    fun onOTPChanged(otpValue : String) {
+        _otpValue.value = otpValue
+    }
 
-        val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                Log.d(TAG, "Phone verification completed automatically.")
-                signInWithCredential(credential = credential)
-            }
+     fun sendOtp(phoneNumber: String) {
+        val formattedPhoneNumber =
+            if (phoneNumber.startsWith("+")) phoneNumber else "+91$phoneNumber"
 
-            override fun onVerificationFailed(e: FirebaseException) {
-                Log.w(TAG, "Phone verification failed.", e)
-                _uiState.update { it.copy(isLoading = false, error = "Failed to send OTP: ${e.message}") }
-            }
+         viewModelScope.launch {
+             _uiState.value = AuthUiState.Loading
 
-            override fun onCodeSent(verificationId: String, token: PhoneAuthProvider.ForceResendingToken) {
-                Log.d(TAG, "OTP code sent successfully.")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isOtpSent = true,
-                        verificationId = verificationId
-                    )
-                }
-                startResendTimer()
+             repository.sendVerificationCode(formattedPhoneNumber).collect { event ->
+                 when (event) {
+                     is PhoneAuthEvent.CodeSent -> {
+                         _uiState.value = AuthUiState.Idle
+                         _verificationId.value = event.verificationId
+                         _isOTPSent.value = true
+                         startResendTimer()
+                     }
 
-            }
+                     is PhoneAuthEvent.VerificationCompleted -> {
+                         // Auto-verification succeeded
+                         signInWithCredential(event.credential)
+                     }
 
-        }
+                     is PhoneAuthEvent.Error -> {
+                         _uiState.value = AuthUiState.Error(event.message)
+                     }
+                 }
+             }
+         }
 
-        // Ensure phone number has country code
-        val formattedPhoneNumber = if (phoneNumber.startsWith("+")) phoneNumber else "+91$phoneNumber"
-        repository.sendVerificationCode(activity, formattedPhoneNumber, callbacks)
     }
 
     /**
      * Verifies the OTP code entered by the user.
      */
     fun verifyOtp(otpCode: String) {
-        val verificationId = _uiState.value.verificationId
-        if (verificationId == null) {
-            _uiState.update { it.copy(error = "Cannot verify OTP without a verification ID.") }
-            return
-        }
-
+        val verificationId = _verificationId.value
         try {
             val credential = repository.getPhoneAuthCredential(verificationId, otpCode)
             signInWithCredential(credential)
         } catch (e: Exception) {
-            _uiState.update { it.copy(error = "Invalid OTP code. Please try again.") }
+            _uiState.value =
+                AuthUiState.Error(e.message ?: "An error occurred during OTP verification.")
         }
     }
 
@@ -117,10 +113,10 @@ class AuthViewModel(
         resendTimerJob?.cancel()
         resendTimerJob = viewModelScope.launch {
             for (i in RESEND_TIMEOUT downTo 1) {
-                _uiState.update { it.copy(resendTimer = i) }
+                _timerValue.value = i
                 delay(1000)
             }
-            _uiState.update { it.copy(resendTimer = 0) }
+            _timerValue.value = 0
         }
     }
 
@@ -129,14 +125,10 @@ class AuthViewModel(
      */
     fun resetAuthFlow() {
         resendTimerJob?.cancel()
-        _uiState.update { AuthUiState() } // Reset to initial state
-    }
-
-    /**
-     * To be called when the error message has been shown and should be cleared.
-     */
-    fun errorShown() {
-        _uiState.update { it.copy(error = null) }
+        _uiState.value = AuthUiState.Idle
+        _verificationId.value = ""
+        _isOTPSent.value = false
+        _timerValue.value = RESEND_TIMEOUT
     }
 
     override fun onCleared() {

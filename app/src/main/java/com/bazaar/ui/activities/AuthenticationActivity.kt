@@ -14,26 +14,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.bazaar.vm.ViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.sujoy.authentication.data.AuthUiState
 import com.sujoy.authentication.ui.AuthenticationScreen
 import com.sujoy.authentication.vm.AuthViewModel
 import com.sujoy.designsystem.theme.BazaarTheme
-import com.sujoy.designsystem.R as DesignR
 
 private const val TAG = "AuthenticationActivity"
 
 class AuthenticationActivity : ComponentActivity() {
-
-    private val googleSignInClient: GoogleSignInClient by lazy {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(DesignR.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        GoogleSignIn.getClient(this, gso)
-    }
 
     private val viewModel: AuthViewModel by viewModels { ViewModelFactory(applicationContext) }
 
@@ -42,33 +32,53 @@ class AuthenticationActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BazaarTheme {
-                val uiState by viewModel.uiState.collectAsState()
+                val uiState by viewModel.uiState.collectAsState(AuthUiState.Idle)
+                val otpValue by viewModel.otpValue.collectAsState("")
+                val isOTPSent by viewModel.isOTPSent.collectAsState()
+                val timerValue by viewModel.timerValue.collectAsState(60)
+
+//                val googleSignInClient: GoogleSignInClient by lazy {
+//        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//            .requestIdToken(getString(DesignR.string.default_web_client_id))
+//            .requestEmail()
+//            .build()
+//        GoogleSignIn.getClient(this, gso)
+//    }
+
+                if (uiState is AuthUiState.Success) {
+                    val intent = Intent(this, DashboardActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
 
                 AuthenticationScreen(
                     uiState = uiState,
-                    onAuthSuccess = {
-                        Toast.makeText(this, "Authentication Successful!", Toast.LENGTH_SHORT)
-                            .show()
-                        val intent = Intent(this, DashboardActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    },
                     onGoogleSignIn = {
-                        googleSignInClient.signOut().addOnCompleteListener {
-                            val signInIntent = googleSignInClient.signInIntent
-                            googleSignInLauncher.launch(signInIntent)
-                        }
+//                        googleSignInClient.signOut().addOnCompleteListener {
+//                            val signInIntent = googleSignInClient.signInIntent
+//                            googleSignInLauncher.launch(signInIntent)
+//                        }
                     },
-                    onPhoneSignIn = { phoneNumber -> viewModel.sendOtp(this, phoneNumber) },
-                    onVerifyOtp = viewModel::verifyOtp,
-                    onResetAuthFlow = viewModel::resetAuthFlow,
-                    onErrorShown = viewModel::errorShown
+                    onPhoneSignIn = {
+                        viewModel.sendOtp(it)
+                    },
+                    onVerifyOtp = {
+                        viewModel.verifyOtp(otpValue)
+                    },
+                    onResetAuthFlow = {
+                        viewModel.resetAuthFlow()
+                    },
+                    isOTPSent = isOTPSent,
+                    timerValue = 0,
+                    onOTPChanged = {
+                        viewModel.onOTPChanged(it)
+                    },
+                    otpCode = otpValue
                 )
             }
         }
     }
 
-    // --- Google Sign-In Logic ---
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -81,7 +91,8 @@ class AuthenticationActivity : ComponentActivity() {
                 viewModel.signInWithCredential(credential)
             } catch (e: ApiException) {
                 Log.w(TAG, "Google Sign-In failed.", e)
-                Toast.makeText(this, "Google Sign-In failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Google Sign-In failed: ${e.message}", Toast.LENGTH_LONG)
+                    .show()
             }
         } else {
             Log.w(TAG, "Google Sign-In flow was cancelled by user.")

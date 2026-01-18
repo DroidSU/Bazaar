@@ -18,10 +18,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -32,12 +28,13 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun OTPComponent(
-    isLoading: Boolean,
-    resendTimer: Int,
+    isEnabled: Boolean,
+    timerValue: Int,
     onVerifyOtp: (String) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    otpCode: String,
+    onOTPChanged: (String) -> Unit
 ) {
-    var otpCode by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -70,7 +67,7 @@ fun OTPComponent(
 
         OutlinedTextField(
             value = otpCode,
-            onValueChange = { if (it.length <= 6) otpCode = it },
+            onValueChange = { onOTPChanged(it) },
             modifier = Modifier.fillMaxWidth(),
             label = { Text("6-Digit Code") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
@@ -80,7 +77,7 @@ fun OTPComponent(
 
         Button(
             onClick = { onVerifyOtp(otpCode) },
-            enabled = !isLoading && otpCode.length == 6,
+            enabled = !isEnabled && otpCode.length == 6,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
@@ -97,10 +94,10 @@ fun OTPComponent(
             Text("Didn't receive the code?", style = MaterialTheme.typography.bodyMedium)
             TextButton(
                 onClick = onBack, // Go back to resend
-                enabled = resendTimer == 0
+                enabled = timerValue == 0
             ) {
                 Text(
-                    if (resendTimer > 0) "Resend in ${resendTimer}s"
+                    if (timerValue > 0) "Resend in ${timerValue}s"
                     else "Resend"
                 )
             }

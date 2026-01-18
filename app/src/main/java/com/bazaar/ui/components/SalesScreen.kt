@@ -238,7 +238,7 @@ fun SalesScreen(
                         val displayValue = if (quantity != 0) quantity else weight
 
                         val productPrice =
-                            productList.find { salesList[index].productId == it.id }?.price
+                            productList.find { salesList[index].productId == it.id }?.price ?: 0.0
                         Text("Qty: $displayValue × ₹$productPrice")
                     },
                     trailingContent = {

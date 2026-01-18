@@ -1,12 +1,8 @@
 package com.sujoy.authentication.data
 
-// Data class to hold all UI state for the AuthenticationScreen
-data class AuthUiState(
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val isAuthSuccessful: Boolean = false,
-
-    val isOtpSent: Boolean = false,
-    val verificationId: String? = null,
-    val resendTimer: Int = 0
-)
+sealed interface AuthUiState {
+    data object Idle : AuthUiState
+    data object Loading : AuthUiState
+    data object Success : AuthUiState
+    data class Error(val message: String) : AuthUiState
+}

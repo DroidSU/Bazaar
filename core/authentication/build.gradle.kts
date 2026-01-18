@@ -33,8 +33,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
     buildFeatures {
         compose = true
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }
 
@@ -60,8 +68,16 @@ dependencies {
     implementation(libs.androidx.room.ktx) // For coroutines support (suspend functions)
     ksp(libs.androidx.room.compiler)
     implementation(libs.google.code.gson)
-    testImplementation(libs.junit)
+    implementation(project(":core:designsystem"))
+
+    // Unit Testing
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(project(":core:designsystem"))
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.google.truth)
+
+    // UI Testing
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
