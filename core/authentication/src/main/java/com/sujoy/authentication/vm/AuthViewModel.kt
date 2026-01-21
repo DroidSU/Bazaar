@@ -39,13 +39,14 @@ class AuthViewModel(
     val phoneNumber = _phoneNumber.asStateFlow()
 
     private var resendTimerJob: Job? = null
+    private var authJob: Job? = null // New: To manage single auth process
 
     /**
      * Signs in the user using a given credential (from Google or Phone).
-     * Updates the UI state based on the outcome.
      */
     fun signInWithCredential(credential: AuthCredential) {
-        viewModelScope.launch {
+        authJob?.cancel() // Cancel previous attempts
+        authJob = viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
 
             repository.signInWithCredentials(credential).collect { result ->
@@ -55,7 +56,6 @@ class AuthViewModel(
                         _isOTPSent.value = false
                         _uiState.value = AuthUiState.Success
                     }
-
                     is AuthResult.Failure -> {
                         _uiState.value = AuthUiState.Error(result.message)
                     }
@@ -68,35 +68,32 @@ class AuthViewModel(
         _otpValue.value = otpValue
     }
 
-     fun sendOtp(phoneNumber: String) {
+    fun sendOtp(phoneNumber: String) {
         val formattedPhoneNumber =
             if (phoneNumber.startsWith("+")) phoneNumber else "+91$phoneNumber"
-         _phoneNumber.value = formattedPhoneNumber
+        _phoneNumber.value = formattedPhoneNumber
 
-         viewModelScope.launch {
-             _uiState.value = AuthUiState.Loading
+        authJob?.cancel() // Cancel previous attempts
+        authJob = viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
 
-             repository.sendVerificationCode(formattedPhoneNumber).collect { event ->
-                 when (event) {
-                     is PhoneAuthEvent.CodeSent -> {
-                         _uiState.value = AuthUiState.Idle
-                         _verificationId.value = event.verificationId
-                         _isOTPSent.value = true
-                         startResendTimer()
-                     }
-
-                     is PhoneAuthEvent.VerificationCompleted -> {
-                         // Auto-verification succeeded
-                         signInWithCredential(event.credential)
-                     }
-
-                     is PhoneAuthEvent.Error -> {
-                         _uiState.value = AuthUiState.Error(event.message)
-                     }
-                 }
-             }
-         }
-
+            repository.sendVerificationCode(formattedPhoneNumber).collect { event ->
+                when (event) {
+                    is PhoneAuthEvent.CodeSent -> {
+                        _uiState.value = AuthUiState.Idle
+                        _verificationId.value = event.verificationId
+                        _isOTPSent.value = true
+                        startResendTimer()
+                    }
+                    is PhoneAuthEvent.VerificationCompleted -> {
+                        signInWithCredential(event.credential)
+                    }
+                    is PhoneAuthEvent.Error -> {
+                        _uiState.value = AuthUiState.Error(event.message)
+                    }
+                }
+            }
+        }
     }
 
     fun resendOtp() {
@@ -106,44 +103,47 @@ class AuthViewModel(
         }
     }
 
-    /**
-     * Verifies the OTP code entered by the user.
-     */
     fun verifyOtp(otpCode: String) {
         val verificationId = _verificationId.value
+        if (verificationId.isEmpty()) {
+            _uiState.value = AuthUiState.Error("Session expired. Please request a new OTP.")
+            return
+        }
+        
         try {
             val credential = repository.getPhoneAuthCredential(verificationId, otpCode)
             signInWithCredential(credential)
         } catch (e: Exception) {
-            _uiState.value =
-                AuthUiState.Error(e.message ?: "An error occurred during OTP verification.")
+            _uiState.value = AuthUiState.Error(e.message ?: "An error occurred during OTP verification.")
         }
     }
 
     private fun startResendTimer() {
         resendTimerJob?.cancel()
         resendTimerJob = viewModelScope.launch {
-            for (i in RESEND_TIMEOUT downTo 0) {
+            // Start from timeout down to 1
+            for (i in RESEND_TIMEOUT downTo 1) {
                 _timerValue.value = i
                 delay(1000)
             }
+            _timerValue.value = 0 // Finished
         }
     }
 
-    /**
-     * Resets the auth flow to go back to the phone number entry screen.
-     */
     fun resetAuthFlow() {
+        authJob?.cancel()
         resendTimerJob?.cancel()
         _uiState.value = AuthUiState.Idle
         _verificationId.value = ""
         _isOTPSent.value = false
         _timerValue.value = RESEND_TIMEOUT
         _phoneNumber.value = ""
+        _otpValue.value = ""
     }
 
     override fun onCleared() {
         super.onCleared()
-        resendTimerJob?.cancel() // Ensure timer is stopped when ViewModel is cleared
+        authJob?.cancel()
+        resendTimerJob?.cancel()
     }
 }

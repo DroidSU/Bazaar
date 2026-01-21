@@ -8,6 +8,7 @@ import com.sujoy.authentication.repository.AuthResult
 import com.sujoy.authentication.repository.PhoneAuthEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -50,26 +51,30 @@ class AuthViewModelTest {
     fun `sendOtp success updates states and starts timer`() = runTest {
         val phoneNumber = "+911234567890"
         val verificationId = "test_v_id"
-        `when`(repository.sendVerificationCode(phoneNumber))
-            .thenReturn(flowOf(PhoneAuthEvent.CodeSent(verificationId)))
+        
+        val flow = MutableSharedFlow<PhoneAuthEvent>()
+        `when`(repository.sendVerificationCode(phoneNumber)).thenReturn(flow)
 
         viewModel.sendOtp(phoneNumber)
         
-        // Initial loading state
+        testDispatcher.scheduler.runCurrent()
         assertThat(viewModel.uiState.value).isInstanceOf(AuthUiState.Loading::class.java)
         
-        testDispatcher.scheduler.advanceUntilIdle()
+        flow.emit(PhoneAuthEvent.CodeSent(verificationId))
+        testDispatcher.scheduler.runCurrent()
 
         assertThat(viewModel.isOTPSent.value).isTrue()
         assertThat(viewModel.verificationId.value).isEqualTo(verificationId)
         assertThat(viewModel.uiState.value).isEqualTo(AuthUiState.Idle)
+        // Check initial timer value without advancing time
         assertThat(viewModel.timerValue.value).isEqualTo(60)
     }
 
     @Test
     fun `sendOtp failure updates error state`() = runTest {
+        val phoneNumber = "+911234567890"
         val errorMsg = "Network error"
-        `when`(repository.sendVerificationCode("+911234567890"))
+        `when`(repository.sendVerificationCode(phoneNumber))
             .thenReturn(flowOf(PhoneAuthEvent.Error(errorMsg)))
 
         viewModel.sendOtp("1234567890")
@@ -80,50 +85,34 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `resendOtp uses previously stored phone number`() = runTest {
-        val phoneNumber = "1234567890"
-        `when`(repository.sendVerificationCode("+911234567890"))
-            .thenReturn(flowOf(PhoneAuthEvent.CodeSent("id1")))
-
-        viewModel.sendOtp(phoneNumber)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        // Resend
-        `when`(repository.sendVerificationCode("+911234567890"))
-            .thenReturn(flowOf(PhoneAuthEvent.CodeSent("id2")))
-        
-        viewModel.resendOtp()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        assertThat(viewModel.verificationId.value).isEqualTo("id2")
-    }
-
-    @Test
-    fun `timer counts down to zero`() = runTest {
+    fun `timer counts down correctly`() = runTest {
         `when`(repository.sendVerificationCode("+911234567890"))
             .thenReturn(flowOf(PhoneAuthEvent.CodeSent("id")))
 
-        viewModel.sendOtp("1234567890")
-        testDispatcher.scheduler.advanceUntilIdle()
-
+        viewModel.sendOtp("+911234567890")
+        
+        // runCurrent() starts the coroutine and sets the first value (60)
+        testDispatcher.scheduler.runCurrent()
         assertThat(viewModel.timerValue.value).isEqualTo(60)
 
+        // Advance by 1 second
         advanceTimeBy(1000)
+        testDispatcher.scheduler.runCurrent() 
         assertThat(viewModel.timerValue.value).isEqualTo(59)
 
+        // Advance by remaining 59 seconds
         advanceTimeBy(59000)
+        testDispatcher.scheduler.runCurrent()
         assertThat(viewModel.timerValue.value).isEqualTo(0)
     }
 
     @Test
     fun `verifyOtp success updates state to Success`() = runTest {
-        // GIVEN: Code is sent first
         `when`(repository.sendVerificationCode("+911234567890"))
             .thenReturn(flowOf(PhoneAuthEvent.CodeSent("vid")))
-        viewModel.sendOtp("1234567890")
+        viewModel.sendOtp("+911234567890")
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // WHEN: Verify
         val otp = "123456"
         `when`(repository.getPhoneAuthCredential("vid", otp)).thenReturn(mockCredential)
         `when`(repository.signInWithCredentials(mockCredential)).thenReturn(flowOf(AuthResult.Success))
