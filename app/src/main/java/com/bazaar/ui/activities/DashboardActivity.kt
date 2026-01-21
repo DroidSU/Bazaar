@@ -51,7 +51,13 @@ class DashboardActivity : ComponentActivity() {
                         startActivity(Intent(this, AddProductActivity::class.java))
                     },
                     lowStockCount = lowStockCount,
-                    outOfStockCount = outOfStockCount
+                    outOfStockCount = outOfStockCount,
+                    onSignOut = {
+                        viewModel.onSignOut()
+                        val intent = Intent(this, AuthenticationActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
                 )
             }
         }

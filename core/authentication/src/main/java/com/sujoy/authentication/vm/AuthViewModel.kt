@@ -35,6 +35,9 @@ class AuthViewModel(
     private val _otpValue = MutableStateFlow("")
     val otpValue = _otpValue.asStateFlow()
 
+    private val _phoneNumber = MutableStateFlow("")
+    val phoneNumber = _phoneNumber.asStateFlow()
+
     private var resendTimerJob: Job? = null
 
     /**
@@ -68,6 +71,7 @@ class AuthViewModel(
      fun sendOtp(phoneNumber: String) {
         val formattedPhoneNumber =
             if (phoneNumber.startsWith("+")) phoneNumber else "+91$phoneNumber"
+         _phoneNumber.value = formattedPhoneNumber
 
          viewModelScope.launch {
              _uiState.value = AuthUiState.Loading
@@ -95,6 +99,13 @@ class AuthViewModel(
 
     }
 
+    fun resendOtp() {
+        val phoneNumber = _phoneNumber.value
+        if (phoneNumber.isNotEmpty()) {
+            sendOtp(phoneNumber)
+        }
+    }
+
     /**
      * Verifies the OTP code entered by the user.
      */
@@ -112,11 +123,10 @@ class AuthViewModel(
     private fun startResendTimer() {
         resendTimerJob?.cancel()
         resendTimerJob = viewModelScope.launch {
-            for (i in RESEND_TIMEOUT downTo 1) {
+            for (i in RESEND_TIMEOUT downTo 0) {
                 _timerValue.value = i
                 delay(1000)
             }
-            _timerValue.value = 0
         }
     }
 
@@ -129,6 +139,7 @@ class AuthViewModel(
         _verificationId.value = ""
         _isOTPSent.value = false
         _timerValue.value = RESEND_TIMEOUT
+        _phoneNumber.value = ""
     }
 
     override fun onCleared() {

@@ -73,7 +73,10 @@ class AuthenticationActivity : ComponentActivity() {
                     onOTPChanged = {
                         viewModel.onOTPChanged(it)
                     },
-                    otpCode = otpValue
+                    otpCode = otpValue,
+                    onResendOtp = {
+                        viewModel.resendOtp()
+                    },
                 )
             }
         }

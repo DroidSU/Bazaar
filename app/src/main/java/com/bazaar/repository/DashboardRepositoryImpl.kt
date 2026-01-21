@@ -44,4 +44,10 @@ class DashboardRepositoryImpl(private val productDAO : ProductsDAO) : DashboardR
             productDAO.insertProduct(products)
         }
     }
+
+    override suspend fun signOut() {
+        if(auth.currentUser != null){
+            auth.signOut()
+        }
+    }
 }

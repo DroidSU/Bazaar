@@ -83,4 +83,11 @@ class DashboardViewModel(private val repository: DashboardRepository) : ViewMode
     private fun getOutOfStockCount() {
         productList.value.count { it.quantity == 0 }.also { _outOfStockCount.value = it}
     }
+
+    fun onSignOut() {
+        viewModelScope.launch {
+            repository.signOut()
+            _isSignedOut.value = true
+        }
+    }
 }

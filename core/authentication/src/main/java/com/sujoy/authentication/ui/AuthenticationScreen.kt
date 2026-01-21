@@ -40,6 +40,7 @@ fun AuthenticationScreen(
     onGoogleSignIn: () -> Unit,
     onPhoneSignIn: (String) -> Unit,
     onVerifyOtp: (String) -> Unit,
+    onResendOtp: () -> Unit,
     onResetAuthFlow: () -> Unit,
     isOTPSent: Boolean,
     timerValue: Int,
@@ -94,6 +95,7 @@ fun AuthenticationScreen(
                             OTPComponent(
                                 timerValue = timerValue,
                                 onVerifyOtp = onVerifyOtp,
+                                onResendOtp = onResendOtp,
                                 onBack = onResetAuthFlow,
                                 isEnabled = isOTPSent,
                                 otpCode = otpCode,
@@ -126,6 +128,7 @@ private fun AuthenticationScreenPreview() {
             onGoogleSignIn = {},
             onPhoneSignIn = {},
             onVerifyOtp = {},
+            onResendOtp = {},
             onResetAuthFlow = {},
             isOTPSent = false,
             timerValue = 0,

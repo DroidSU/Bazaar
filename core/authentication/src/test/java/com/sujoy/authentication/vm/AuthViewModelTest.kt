@@ -1,22 +1,24 @@
 package com.sujoy.authentication.vm
 
-import android.app.Activity
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.auth.AuthCredential
+import com.sujoy.authentication.data.AuthUiState
 import com.sujoy.authentication.repository.AuthRepository
+import com.sujoy.authentication.repository.AuthResult
+import com.sujoy.authentication.repository.PhoneAuthEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,9 +31,6 @@ class AuthViewModelTest {
 
     @Mock
     private lateinit var mockCredential: AuthCredential
-
-    @Mock
-    private lateinit var activity: Activity
 
     private lateinit var viewModel: AuthViewModel
 
@@ -48,59 +47,107 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `sendOtp updates loading state and calls repository`() = runTest {
+    fun `sendOtp success updates states and starts timer`() = runTest {
+        val phoneNumber = "+911234567890"
+        val verificationId = "test_v_id"
+        `when`(repository.sendVerificationCode(phoneNumber))
+            .thenReturn(flowOf(PhoneAuthEvent.CodeSent(verificationId)))
+
+        viewModel.sendOtp(phoneNumber)
+        
+        // Initial loading state
+        assertThat(viewModel.uiState.value).isInstanceOf(AuthUiState.Loading::class.java)
+        
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertThat(viewModel.isOTPSent.value).isTrue()
+        assertThat(viewModel.verificationId.value).isEqualTo(verificationId)
+        assertThat(viewModel.uiState.value).isEqualTo(AuthUiState.Idle)
+        assertThat(viewModel.timerValue.value).isEqualTo(60)
+    }
+
+    @Test
+    fun `sendOtp failure updates error state`() = runTest {
+        val errorMsg = "Network error"
+        `when`(repository.sendVerificationCode("+911234567890"))
+            .thenReturn(flowOf(PhoneAuthEvent.Error(errorMsg)))
+
+        viewModel.sendOtp("1234567890")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertThat(viewModel.uiState.value).isInstanceOf(AuthUiState.Error::class.java)
+        assertThat((viewModel.uiState.value as AuthUiState.Error).message).isEqualTo(errorMsg)
+    }
+
+    @Test
+    fun `resendOtp uses previously stored phone number`() = runTest {
         val phoneNumber = "1234567890"
-        val expectedFormattedNumber = "+911234567890"
+        `when`(repository.sendVerificationCode("+911234567890"))
+            .thenReturn(flowOf(PhoneAuthEvent.CodeSent("id1")))
 
-        // WHEN: We call sendOtp
-        viewModel.sendOtp(activity, phoneNumber)
+        viewModel.sendOtp(phoneNumber)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        // THEN: Verify loading is shown
-        assertThat(viewModel.uiState.value.isLoading).isTrue()
-
-        // THEN: Verify repository is called with formatted number
-        verify(repository).sendVerificationCode(
-            eq(activity),
-            eq(expectedFormattedNumber),
-            any()
-        )
-    }
-
-    @Test
-    fun `verifyOtp updates error if verificationId is null`() = runTest {
-        // GIVEN: verificationId is null (initial state)
-        assertThat(viewModel.uiState.value.verificationId).isNull()
-
-        // WHEN: We call verifyOtp
-        viewModel.verifyOtp("123456")
-
-        // THEN: Verify error message
-        assertThat(viewModel.uiState.value.error).isEqualTo("Cannot verify OTP without a verification ID.")
-    }
-
-    @Test
-    fun `verifyOtp calls getPhoneAuthCredential and sign in when verificationId exists`() = runTest {
-        // GIVEN: Set up state with a verification ID
-        // (Note: Since uiState is a StateFlow, we might need to trigger onCodeSent logic or 
-        // use a helper if we want to test the full flow, but here we can test the dependency call)
+        // Resend
+        `when`(repository.sendVerificationCode("+911234567890"))
+            .thenReturn(flowOf(PhoneAuthEvent.CodeSent("id2")))
         
-        // Let's use reflection or a test-only state update if necessary, 
-        // but typically we'd mock the callback and trigger onCodeSent.
-        // For a simple unit test of verifyOtp logic:
-        
-        // This is a bit tricky with StateFlow without a public way to set verificationId.
-        // Usually, you'd test the flow: sendOtp -> callback.onCodeSent -> verifyOtp.
+        viewModel.resendOtp()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertThat(viewModel.verificationId.value).isEqualTo("id2")
     }
 
     @Test
-    fun `getPhoneAuthCredential is called via verifyOtp if verificationId is set`() = runTest {
-        // We'll test the repository interaction of getPhoneAuthCredential
-        val verificationId = "vId"
+    fun `timer counts down to zero`() = runTest {
+        `when`(repository.sendVerificationCode("+911234567890"))
+            .thenReturn(flowOf(PhoneAuthEvent.CodeSent("id")))
+
+        viewModel.sendOtp("1234567890")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertThat(viewModel.timerValue.value).isEqualTo(60)
+
+        advanceTimeBy(1000)
+        assertThat(viewModel.timerValue.value).isEqualTo(59)
+
+        advanceTimeBy(59000)
+        assertThat(viewModel.timerValue.value).isEqualTo(0)
+    }
+
+    @Test
+    fun `verifyOtp success updates state to Success`() = runTest {
+        // GIVEN: Code is sent first
+        `when`(repository.sendVerificationCode("+911234567890"))
+            .thenReturn(flowOf(PhoneAuthEvent.CodeSent("vid")))
+        viewModel.sendOtp("1234567890")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // WHEN: Verify
         val otp = "123456"
-        
-        // We need to get the ViewModel into a state where verificationId is set.
-        // The only way is through sendOtp's callback (which is internal).
-        // This suggests a design improvement for testability, but for now, 
-        // let's test what we can.
+        `when`(repository.getPhoneAuthCredential("vid", otp)).thenReturn(mockCredential)
+        `when`(repository.signInWithCredentials(mockCredential)).thenReturn(flowOf(AuthResult.Success))
+
+        viewModel.verifyOtp(otp)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertThat(viewModel.uiState.value).isEqualTo(AuthUiState.Success)
+        assertThat(viewModel.isOTPSent.value).isFalse()
+    }
+
+    @Test
+    fun `resetAuthFlow resets all states and cancels timer`() = runTest {
+        `when`(repository.sendVerificationCode("+911234567890"))
+            .thenReturn(flowOf(PhoneAuthEvent.CodeSent("vid")))
+        viewModel.sendOtp("1234567890")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.resetAuthFlow()
+
+        assertThat(viewModel.uiState.value).isEqualTo(AuthUiState.Idle)
+        assertThat(viewModel.isOTPSent.value).isFalse()
+        assertThat(viewModel.verificationId.value).isEmpty()
+        assertThat(viewModel.phoneNumber.value).isEmpty()
+        assertThat(viewModel.timerValue.value).isEqualTo(60)
     }
 }

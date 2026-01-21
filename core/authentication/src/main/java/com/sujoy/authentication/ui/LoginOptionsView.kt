@@ -32,8 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sujoy.designsystem.theme.BazaarTheme
 
 @Composable
 fun LoginOptionsView(
@@ -106,8 +108,8 @@ fun LoginOptionsView(
             horizontalArrangement = Arrangement.Center
         ) {
             HorizontalDivider(Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
-            Text("OR", Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            HorizontalDivider(Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+//            Text("OR", Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+//            HorizontalDivider(Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
         }
 
         // Google Sign-In Button
@@ -125,5 +127,17 @@ fun LoginOptionsView(
 //            Text("Sign in with Google", Modifier.padding(start = 12.dp), fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
 //        }
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginOptionsViewPreview() {
+    BazaarTheme {
+        LoginOptionsView(
+            isEnabled = true,
+            onGoogleSignIn = {},
+            onPhoneSignIn = {}
+        )
     }
 }

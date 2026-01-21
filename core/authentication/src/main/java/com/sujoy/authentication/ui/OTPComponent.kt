@@ -23,14 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sujoy.designsystem.theme.BazaarTheme
 
 @Composable
 fun OTPComponent(
     isEnabled: Boolean,
     timerValue: Int,
     onVerifyOtp: (String) -> Unit,
+    onResendOtp: () -> Unit,
     onBack: () -> Unit,
     otpCode: String,
     onOTPChanged: (String) -> Unit
@@ -77,7 +80,7 @@ fun OTPComponent(
 
         Button(
             onClick = { onVerifyOtp(otpCode) },
-            enabled = !isEnabled && otpCode.length == 6,
+            enabled = isEnabled && otpCode.length == 6,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
@@ -93,7 +96,7 @@ fun OTPComponent(
         ) {
             Text("Didn't receive the code?", style = MaterialTheme.typography.bodyMedium)
             TextButton(
-                onClick = onBack, // Go back to resend
+                onClick = onResendOtp,
                 enabled = timerValue == 0
             ) {
                 Text(
@@ -102,5 +105,21 @@ fun OTPComponent(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OTPComponentPreview() {
+    BazaarTheme {
+        OTPComponent(
+            isEnabled = true,
+            timerValue = 60,
+            onVerifyOtp = {},
+            onResendOtp = {},
+            onBack = {},
+            otpCode = "",
+            onOTPChanged = {}
+        )
     }
 }
