@@ -5,12 +5,12 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bazaar.db.dao.ProductsDAO
-import com.bazaar.models.Product
 import com.bazaar.models.UploadState
 import com.bazaar.repository.ProductRepository
 import com.bazaar.repository.ProductsUiState
 import com.bazaar.utils.SortOption
 import com.sujoy.designsystem.utils.WeightUnit
+import com.sujoy.model.Product
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.UUID
+import kotlin.collections.forEachIndexed
 
 class ProductsActivityViewModel(private val repository: ProductRepository, private val productsDAO: ProductsDAO) : ViewModel() {
 

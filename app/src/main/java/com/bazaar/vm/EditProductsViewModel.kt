@@ -2,9 +2,9 @@ package com.bazaar.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bazaar.models.Product
 import com.bazaar.repository.EditProductsUiState
 import com.bazaar.repository.ProductRepository
+import com.sujoy.model.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

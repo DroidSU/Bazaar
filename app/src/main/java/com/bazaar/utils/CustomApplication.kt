@@ -9,9 +9,9 @@ import androidx.room.TypeConverters
 import com.bazaar.dao.Converters
 import com.bazaar.dao.TransactionsDAO
 import com.bazaar.db.dao.ProductsDAO
-import com.bazaar.models.Product
 import com.bazaar.models.Transactions
 import com.google.firebase.FirebaseApp
+import com.sujoy.model.Product
 
 class CustomApplication : Application() {
     override fun onCreate() {

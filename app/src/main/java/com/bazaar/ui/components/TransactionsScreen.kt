@@ -19,9 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bazaar.models.CheckoutState
-import com.bazaar.models.Product
 import com.bazaar.models.SaleItemModel
 import com.sujoy.designsystem.theme.BazaarTheme
+import com.sujoy.model.Product
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 

@@ -23,3 +23,8 @@ rootProject.name = "Bazaar"
 include(":app")
 include(":core:designsystem")
 include(":core:authentication")
+include(":core:model")
+include(":core:common")
+include(":core:database")
+include(":core:data")
+include(":feature:dashboard")

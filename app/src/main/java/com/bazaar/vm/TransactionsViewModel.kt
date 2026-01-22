@@ -5,17 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bazaar.dao.TransactionsDAO
 import com.bazaar.models.CheckoutState
-import com.bazaar.models.Product
 import com.bazaar.models.SaleItemModel
 import com.bazaar.models.Transactions
 import com.bazaar.repository.TransactionsRepository
-import com.bazaar.utils.ConstantsManager
+import com.sujoy.common.ConstantsManager
+import com.sujoy.model.Product
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.collections.find
 
 class TransactionsViewModel(private val repository: TransactionsRepository, private val transactionsDAO: TransactionsDAO) : ViewModel() {
     private val _salesList = MutableStateFlow<List<SaleItemModel>>(emptyList())

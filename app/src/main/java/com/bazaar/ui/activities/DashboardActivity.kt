@@ -9,10 +9,9 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.bazaar.models.Product
-import com.bazaar.ui.components.DashboardScreen
-import com.bazaar.vm.DashboardViewModel
 import com.bazaar.vm.ViewModelFactory
+import com.sujoy.dashboard.DashboardScreen
+import com.sujoy.dashboard.DashboardViewModel
 import com.sujoy.designsystem.theme.BazaarTheme
 
 class DashboardActivity : ComponentActivity() {
@@ -21,15 +20,11 @@ class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             BazaarTheme {
-                val isSignedOut by viewModel.isSignedOut.collectAsState()
-                val productList by viewModel.productList.collectAsState(emptyList<Product>())
-                val lowStockCount by viewModel.lowStockCount.collectAsState(0)
-                val outOfStockCount by viewModel.outOfStockCount.collectAsState(0)
+                val uiState by viewModel.uiState.collectAsState()
 
-                if(isSignedOut) {
+                if(uiState.isSignedOut) {
                     LaunchedEffect(Unit) {
                         val intent = Intent(this@DashboardActivity, AuthenticationActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -40,7 +35,7 @@ class DashboardActivity : ComponentActivity() {
                 }
 
                 DashboardScreen(
-                    productList = productList,
+                    productList = uiState.productList,
                     onTransactionsClicked = {
                         startActivity(Intent(this, TransactionsActivity::class.java))
                     },
@@ -50,13 +45,10 @@ class DashboardActivity : ComponentActivity() {
                     onAddNewItemClicked = {
                         startActivity(Intent(this, AddProductActivity::class.java))
                     },
-                    lowStockCount = lowStockCount,
-                    outOfStockCount = outOfStockCount,
+                    lowStockCount = uiState.lowStockCount,
+                    outOfStockCount = uiState.outOfStockCount,
                     onSignOut = {
                         viewModel.onSignOut()
-                        val intent = Intent(this, AuthenticationActivity::class.java)
-                        startActivity(intent)
-                        finish()
                     }
                 )
             }

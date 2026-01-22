@@ -32,9 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bazaar.models.Product
 import com.sujoy.designsystem.components.CornerRibbon
 import com.sujoy.designsystem.theme.BazaarTheme
+import com.sujoy.model.Product
 import java.text.NumberFormat
 import java.util.Locale
 

@@ -64,6 +64,10 @@ dependencies {
     implementation(libs.google.code.gson)
     implementation(project(":core:designsystem"))
     implementation(project(":core:authentication"))
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
+    implementation(project(":core:data"))
+    implementation(project(":feature:dashboard"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

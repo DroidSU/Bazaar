@@ -2,8 +2,8 @@ package com.bazaar.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.bazaar.utils.ConstantsManager
 import com.google.firebase.firestore.PropertyName
+import com.sujoy.common.ConstantsManager
 
 @Entity(tableName = ConstantsManager.TABLE_TRANSACTIONS)
 data class Transactions(

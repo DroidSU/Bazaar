@@ -6,9 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bazaar.models.Product
 import com.bazaar.repository.ProductRepository
 import com.sujoy.designsystem.utils.WeightUnit
+import com.sujoy.model.Product
 import kotlinx.coroutines.launch
 
 class AddProductViewModel(private val repository: ProductRepository) : ViewModel() {
