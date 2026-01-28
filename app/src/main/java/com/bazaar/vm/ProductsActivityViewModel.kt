@@ -4,11 +4,11 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bazaar.db.dao.ProductsDAO
 import com.bazaar.models.UploadState
-import com.bazaar.repository.ProductRepository
-import com.bazaar.repository.ProductsUiState
 import com.bazaar.utils.SortOption
+import com.sujoy.common.AppUIState
+import com.sujoy.data.repository.ProductRepository
+import com.sujoy.database.dao.ProductsDAO
 import com.sujoy.designsystem.utils.WeightUnit
 import com.sujoy.model.Product
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +21,10 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.UUID
-import kotlin.collections.forEachIndexed
 
 class ProductsActivityViewModel(private val repository: ProductRepository, private val productsDAO: ProductsDAO) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<ProductsUiState>(ProductsUiState.Loading)
+    private val _uiState = MutableStateFlow<AppUIState>(AppUIState.Loading)
     val uiState = _uiState.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
@@ -35,6 +34,9 @@ class ProductsActivityViewModel(private val repository: ProductRepository, priva
     val sortOption = _sortOption.asStateFlow()
 
     private var originalProducts = listOf<Product>()
+
+    private val _productsList = MutableStateFlow<List<Product>>(emptyList())
+    val productsList = _productsList.asStateFlow()
 
     // StateFlow to manage the state of the CSV upload.
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
@@ -50,15 +52,15 @@ class ProductsActivityViewModel(private val repository: ProductRepository, priva
             repository.getProducts()
                 .catch { exception ->
                     _uiState.value =
-                        ProductsUiState.Error(exception.message ?: "An unknown error occurred")
+                        AppUIState.Error(exception.message ?: "An unknown error occurred")
                 }
                 .collect { result ->
                 result.onSuccess { products ->
-                    originalProducts = products.filter { !it.isDeleted }
-                    _uiState.value = ProductsUiState.Success(originalProducts)
+                    _productsList.value = products.filter { !it.isDeleted }
+                    _uiState.value = AppUIState.Success
                 }.onFailure {
                     _uiState.value =
-                        ProductsUiState.Error(it.message ?: "An unknown error occurred")
+                        AppUIState.Error(it.message ?: "An unknown error occurred")
                 }
             }
         }
@@ -69,7 +71,7 @@ class ProductsActivityViewModel(private val repository: ProductRepository, priva
             repository.getProducts()
                 .catch { exception ->
                     _uiState.value =
-                        ProductsUiState.Error(exception.message ?: "An unknown error occurred")
+                        AppUIState.Error(exception.message ?: "An unknown error occurred")
                 }
                 .collect { result ->
                     result.onSuccess { products ->
@@ -77,7 +79,7 @@ class ProductsActivityViewModel(private val repository: ProductRepository, priva
                         filterProducts()
                     }.onFailure {
                         _uiState.value =
-                            ProductsUiState.Error(it.message ?: "An unknown error occurred")
+                            AppUIState.Error(it.message ?: "An unknown error occurred")
                     }
                 }
         }
@@ -106,7 +108,8 @@ class ProductsActivityViewModel(private val repository: ProductRepository, priva
             SortOption.PRICE_LOW_TO_HIGH -> filteredList.sortedBy { it.price }
         }
 
-        _uiState.value = ProductsUiState.Success(sortedList)
+        _uiState.value = AppUIState.Success
+        _productsList.value = sortedList
     }
 
     fun onDismissUpload() {

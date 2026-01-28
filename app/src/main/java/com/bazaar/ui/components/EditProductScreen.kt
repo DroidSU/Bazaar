@@ -54,7 +54,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bazaar.repository.EditProductsUiState
+import com.sujoy.common.AppUIState
 import com.sujoy.designsystem.components.AdaptiveThresholdView
 import com.sujoy.designsystem.components.NeumorphicTextField
 import com.sujoy.designsystem.components.PriceField
@@ -70,11 +70,11 @@ fun EditProductScreen(
     product: Product,
     onSave: (Product) -> Unit,
     onDismiss: () -> Unit,
-    uiState: EditProductsUiState,
+    uiState: AppUIState,
     onReset: () -> Unit,
 ) {
 
-    val isBusy = uiState is EditProductsUiState.Loading
+    val isBusy = uiState is AppUIState.Loading
 
     var name by remember { mutableStateOf(product.name) }
     var quantity by remember { mutableStateOf(product.quantity.toString()) }
@@ -90,7 +90,7 @@ fun EditProductScreen(
 
     // Auto-dismiss on Success
     LaunchedEffect(uiState) {
-        if (uiState is EditProductsUiState.Success) {
+        if (uiState is AppUIState.Success) {
             delay(1500) // Wait 1.5 seconds to show the Green Tick
             onDismiss()
         }
@@ -265,7 +265,7 @@ fun EditProductScreen(
             }
         }
 
-        if (uiState !is EditProductsUiState.Idle) {
+        if (uiState !is AppUIState.Idle) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -274,7 +274,7 @@ fun EditProductScreen(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = remember { null },
                         onClick = {
-                            if (uiState is EditProductsUiState.Error) {
+                            if (uiState is AppUIState.Error) {
                                 onReset
                             }
                         }
@@ -286,14 +286,14 @@ fun EditProductScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     when (uiState) {
-                        is EditProductsUiState.Loading -> {
+                        is AppUIState.Loading -> {
                             CircularProgressIndicator(
                                 color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.height(24.dp),
                                 strokeWidth = 3.dp
                             )
                         }
-                        is EditProductsUiState.Success -> {
+                        is AppUIState.Success -> {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = "Success",
@@ -309,7 +309,7 @@ fun EditProductScreen(
                             )
                         }
 
-                        is EditProductsUiState.Error -> {
+                        is AppUIState.Error -> {
                             Icon(
                                 imageVector = Icons.Default.Cancel,
                                 contentDescription = "Error",
@@ -362,7 +362,7 @@ private fun EditProductScreenPreview() {
             product = product,
             onSave = {},
             onDismiss = {},
-            uiState = EditProductsUiState.Idle,
+            uiState = AppUIState.Idle,
             onReset = {}
         )
     }

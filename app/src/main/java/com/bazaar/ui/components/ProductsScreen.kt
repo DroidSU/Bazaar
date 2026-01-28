@@ -60,9 +60,8 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bazaar.R
 import com.bazaar.models.UploadState
-import com.bazaar.repository.ProductsUiState
-import com.bazaar.ui.activities.EditProductActivity
 import com.bazaar.utils.SortOption
+import com.sujoy.common.AppUIState
 import com.sujoy.designsystem.components.FabAction
 import com.sujoy.designsystem.components.MultiFloatingButton
 import com.sujoy.designsystem.components.SearchBar
@@ -74,7 +73,8 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
-    uiState: ProductsUiState,
+    uiState: AppUIState,
+    productList: List<Product>,
     searchQuery: String,
     uploadState: UploadState,
     onQueryChange: (String) -> Unit,
@@ -83,7 +83,8 @@ fun ProductScreen(
     onDismissUpload: () -> Unit,
     onDeleteProduct: (Product) -> Unit,
     currentSortOption: SortOption,
-    onSortOptionChange: (SortOption) -> Unit
+    onSortOptionChange: (SortOption) -> Unit,
+    onEditClicked: (Product) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -206,46 +207,24 @@ fun ProductScreen(
                 contentAlignment = Alignment.Center
             ) {
                 when (uiState) {
-                    is ProductsUiState.Loading -> CircularProgressIndicator()
-                    is ProductsUiState.Success -> {
-                        val products = uiState.products
+                    is AppUIState.Idle -> {
+                        EmptyState(isSearch = searchQuery.isNotEmpty())
+                    }
 
-                        if (products.isEmpty()) {
+                    is AppUIState.Loading -> CircularProgressIndicator()
+                    is AppUIState.Success -> {
+                        if (productList.isEmpty()) {
                             EmptyState(isSearch = searchQuery.isNotEmpty())
                         } else {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
                                 contentPadding = PaddingValues(bottom = 80.dp)
                             ) {
-                                items(items = products, key = { it.id }) { product ->
+                                items(items = productList, key = { it.id }) { product ->
                                     ProductListItem(
                                         product,
-                                        onEditClick = { selectedProduct ->
-                                            // Open the Activity directly
-                                            val intent = Intent(
-                                                context,
-                                                EditProductActivity::class.java
-                                            ).apply {
-                                                // Assuming Product is not Parcelable, passing fields individually
-                                                putExtra("PRODUCT_ID", selectedProduct.id)
-                                                putExtra("PRODUCT_NAME", selectedProduct.name)
-                                                putExtra(
-                                                    "PRODUCT_QUANTITY",
-                                                    selectedProduct.quantity
-                                                )
-                                                putExtra("PRODUCT_WEIGHT", selectedProduct.weight)
-                                                putExtra("PRODUCT_UNIT", selectedProduct.weightUnit)
-                                                putExtra("PRODUCT_PRICE", selectedProduct.price)
-                                                putExtra(
-                                                    "PRODUCT_CREATED",
-                                                    selectedProduct.createdOn
-                                                )
-                                                putExtra(
-                                                    "PRODUCT_THRESHOLD",
-                                                    selectedProduct.thresholdValue
-                                                )
-                                            }
-                                            context.startActivity(intent)
+                                        onEditClick = {
+                                            onEditClicked(product)
                                         },
                                         onDelete = onDeleteProduct,
                                         onSwipeLeft = {})
@@ -255,7 +234,7 @@ fun ProductScreen(
                         }
                     }
 
-                    is ProductsUiState.Error -> {
+                    is AppUIState.Error -> {
                         Text(
                             text = uiState.message,
                             color = MaterialTheme.colorScheme.error,
@@ -357,19 +336,7 @@ private fun EmptyState(isSearch: Boolean) {
 private fun ProductScreenPreview() {
     BazaarTheme {
         ProductScreen(
-            uiState = ProductsUiState.Success(
-                listOf(
-                    Product(
-                        id = "01",
-                        name = "Sample Product",
-                        quantity = 10,
-                        price = 99.99,
-                        weight = 1.0,
-                        weightUnit = WeightUnit.KG.toString(),
-                        createdOn = System.currentTimeMillis()
-                    )
-                )
-            ),
+            uiState = AppUIState.Success,
             searchQuery = "",
             uploadState = UploadState.Uploading(50),
             onQueryChange = {},
@@ -378,7 +345,19 @@ private fun ProductScreenPreview() {
             onDismissUpload = {},
             onDeleteProduct = {},
             currentSortOption = SortOption.NAME_ASC,
-            onSortOptionChange = {}
+            onSortOptionChange = {},
+            productList = listOf(
+                Product(
+                    id = "01",
+                    name = "Sample Product",
+                    quantity = 10,
+                    price = 99.99,
+                    weight = 1.0,
+                    weightUnit = WeightUnit.KG.toString(),
+                    createdOn = System.currentTimeMillis()
+                )
+            ),
+            onEditClicked = {}
         )
     }
 }

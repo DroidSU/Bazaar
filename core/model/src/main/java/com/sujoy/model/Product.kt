@@ -1,6 +1,12 @@
 package com.sujoy.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.sujoy.common.ConstantsManager
+
+@Entity(tableName = ConstantsManager.TABLE_PRODUCTS)
 data class Product(
+    @PrimaryKey
     var id: String = "",
     var name: String = "",
     var quantity: Int = 0,

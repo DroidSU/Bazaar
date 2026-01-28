@@ -51,20 +51,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bazaar.R
 import com.bazaar.models.CheckoutState
-import com.bazaar.models.SaleItemModel
+import com.sujoy.database.model.SaleItemEntity
 import com.sujoy.designsystem.components.SuccessDialog
 import com.sujoy.designsystem.theme.BazaarTheme
 import com.sujoy.model.Product
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlin.collections.find
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SalesScreen(
     productList: List<Product>,
-    salesList: List<SaleItemModel>,
+    salesList: List<SaleItemEntity>,
     selectedProduct: Product?,
     selectedQuantityForSales: Int,
     onProductSelected: (String) -> Unit,

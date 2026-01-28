@@ -3,12 +3,13 @@ package com.bazaar.vm
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.bazaar.repository.DashboardRepositoryImpl
-import com.bazaar.repository.ProductRepositoryImpl
-import com.bazaar.repository.TransactionsRepositoryImpl
-import com.bazaar.utils.AppDatabase
 import com.sujoy.authentication.data.AuthRepositoryImpl
 import com.sujoy.authentication.vm.AuthViewModel
+import com.sujoy.dashboard.DashboardViewModel
+import com.sujoy.data.repository.DashboardRepositoryImpl
+import com.sujoy.data.repository.ProductRepositoryImpl
+import com.sujoy.data.repository.TransactionsRepositoryImpl
+import com.sujoy.database.AppDatabase
 
 class ViewModelFactory(private val context : Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -19,7 +20,7 @@ class ViewModelFactory(private val context : Context) : ViewModelProvider.Factor
             }
             modelClass.isAssignableFrom(ProductsActivityViewModel::class.java) -> {
                 val db = AppDatabase.getInstance(context)
-                ProductsActivityViewModel(ProductRepositoryImpl(), db.productDao()) as T
+                ProductsActivityViewModel(ProductRepositoryImpl(), db.productsDao()) as T
             }
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(AuthRepositoryImpl()) as T
@@ -29,11 +30,11 @@ class ViewModelFactory(private val context : Context) : ViewModelProvider.Factor
             }
             modelClass.isAssignableFrom(DashboardViewModel::class.java) -> {
                 val db = AppDatabase.getInstance(context)
-                DashboardViewModel(DashboardRepositoryImpl(db.productDao())) as T
+                DashboardViewModel(DashboardRepositoryImpl(db.productsDao())) as T
             }
             modelClass.isAssignableFrom(TransactionsViewModel::class.java) -> {
                 val db = AppDatabase.getInstance(context)
-                TransactionsViewModel(TransactionsRepositoryImpl(db.productDao()), db.transactionsDAO()) as T
+                TransactionsViewModel(TransactionsRepositoryImpl(db.productsDao()), db.transactionsDao()) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

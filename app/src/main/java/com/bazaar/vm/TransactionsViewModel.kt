@@ -3,12 +3,12 @@ package com.bazaar.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bazaar.dao.TransactionsDAO
 import com.bazaar.models.CheckoutState
-import com.bazaar.models.SaleItemModel
-import com.bazaar.models.Transactions
-import com.bazaar.repository.TransactionsRepository
 import com.sujoy.common.ConstantsManager
+import com.sujoy.data.repository.TransactionsRepository
+import com.sujoy.database.dao.TransactionsDAO
+import com.sujoy.database.model.SaleItemEntity
+import com.sujoy.database.model.TransactionEntity
 import com.sujoy.model.Product
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,10 +16,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.collections.find
 
 class TransactionsViewModel(private val repository: TransactionsRepository, private val transactionsDAO: TransactionsDAO) : ViewModel() {
-    private val _salesList = MutableStateFlow<List<SaleItemModel>>(emptyList())
+    private val _salesList = MutableStateFlow<List<SaleItemEntity>>(emptyList())
     val salesList = _salesList.asStateFlow()
 
     private val _productList = MutableStateFlow<List<Product>>(emptyList())
@@ -85,7 +84,7 @@ class TransactionsViewModel(private val repository: TransactionsRepository, priv
     fun onAddToCart() {
         _totalAmount.value += (_selectedSalesProduct.value?.price ?: 0.0) * _selectedQuantityForSales.value
 
-        val saleItemModel = SaleItemModel(
+        val saleItemModel = SaleItemEntity(
             productId = _selectedSalesProduct.value?.id ?: "",
             productName = _selectedSalesProduct.value?.name ?: "",
             quantity = _selectedQuantityForSales.value,
@@ -102,12 +101,12 @@ class TransactionsViewModel(private val repository: TransactionsRepository, priv
     fun onCheckout() {
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                val transactions = Transactions(
+                val transactionEntity = TransactionEntity(
                     itemsList = _salesList.value,
                     totalAmount = _totalAmount.value,
                     createdOn = System.currentTimeMillis()
                 )
-                transactionsDAO.insertTransaction(transactions)
+                transactionsDAO.insertTransaction(transactionEntity)
                 _salesList.value = emptyList()
                 _totalAmount.value = 0.0
                 Log.d(ConstantsManager.APP_TAG, "onCheckout: Transaction added successfully")

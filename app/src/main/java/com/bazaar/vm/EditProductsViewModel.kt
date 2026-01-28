@@ -2,8 +2,8 @@ package com.bazaar.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bazaar.repository.EditProductsUiState
-import com.bazaar.repository.ProductRepository
+import com.sujoy.common.AppUIState
+import com.sujoy.data.repository.ProductRepository
 import com.sujoy.model.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,24 +11,24 @@ import kotlinx.coroutines.launch
 
 class EditProductsViewModel(private val repository: ProductRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<EditProductsUiState>(EditProductsUiState.Idle)
+    private val _uiState = MutableStateFlow<AppUIState>(AppUIState.Idle)
     val uiState = _uiState.asStateFlow()
 
 
     fun onUpdateProduct(product: Product) {
         viewModelScope.launch {
-            _uiState.value = EditProductsUiState.Loading
+            _uiState.value = AppUIState.Loading
 
             val result = repository.updateProduct(product)
             result.onSuccess {
-                _uiState.value = EditProductsUiState.Success
+                _uiState.value = AppUIState.Success
             }.onFailure {
-                _uiState.value = EditProductsUiState.Error(it.message ?: "Update Failed")
+                _uiState.value = AppUIState.Error(it.message ?: "Update Failed")
             }
         }
     }
 
     fun resetState() {
-        _uiState.value = EditProductsUiState.Idle
+        _uiState.value = AppUIState.Idle
     }
 }
