@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
 }
 
@@ -15,7 +15,7 @@ android {
         minSdk = 27
         targetSdk = 36
         versionCode = 1
-        versionName = "1.3"
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,6 +42,16 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
+    implementation(project(":core:data"))
+    implementation(project(":core:database"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:authentication"))
+    implementation(project(":feature:dashboard"))
+    implementation(project(":feature:products"))
+    implementation(project(":feature:transactions"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,25 +60,19 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(platform(libs.firebase.bom))
+    implementation(libs.androidx.material.icons.extended)
+
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    implementation(libs.lottie.compose)
-    implementation(libs.androidx.material.icons.extended)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.benchmark.common)
+
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx) // For coroutines support (suspend functions)
+    implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    implementation(libs.lottie.compose)
     implementation(libs.google.code.gson)
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:authentication"))
-    implementation(project(":core:model"))
-    implementation(project(":core:common"))
-    implementation(project(":core:data"))
-    implementation(project(":core:database"))
-    implementation(project(":feature:dashboard"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

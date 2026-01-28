@@ -15,4 +15,10 @@ interface ProductsDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProducts(productList: List<Product>)
+
+    @Query("SELECT * FROM ${ConstantsManager.TABLE_PRODUCTS} WHERE id = :id")
+    suspend fun getProductById(id: String): Product
+
+    @Query("UPDATE ${ConstantsManager.TABLE_PRODUCTS} SET quantity = :newQuantity WHERE id = :productId")
+    suspend fun updateProductQuantity(productId: String, newQuantity: Int)
 }

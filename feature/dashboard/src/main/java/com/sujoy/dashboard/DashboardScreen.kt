@@ -42,10 +42,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,33 +59,29 @@ import com.sujoy.designsystem.theme.md_dashboard_low_stock_icon_light
 import com.sujoy.designsystem.theme.md_dashboard_out_of_stock_background_dark
 import com.sujoy.designsystem.theme.md_dashboard_out_of_stock_background_light
 import com.sujoy.designsystem.theme.md_dashboard_out_of_stock_icon_light
-import com.sujoy.model.Product
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    productList: List<Product>,
-    onTransactionsClicked: () -> Unit,
-    onTotalItemsClicked: () -> Unit,
-    onAddNewItemClicked: () -> Unit,
-    onSignOut: () -> Unit,
+    modifier: Modifier = Modifier,
+    totalItemsCount: Int,
     lowStockCount: Int,
-    outOfStockCount: Int
+    outOfStockCount: Int,
+    showMenu: Boolean,
+    onMenuClick: (Boolean) -> Unit,
+    onViewAllProducts: () -> Unit,
+    onViewTransactions: () -> Unit,
+    onAddNewProduct: () -> Unit,
+    onSignOut: () -> Unit,
 ) {
-    // Define dynamic colors based on theme
     val isDark = isSystemInDarkTheme()
-    // Low Stock Colors
     val lowStockIconColor = if (isDark) md_dashboard_low_stock_icon_dark else md_dashboard_low_stock_icon_light
     val lowStockContainerColor = if (isDark) md_dashboard_low_stock_background_dark else md_dashboard_low_stock_background_light
-
-    // Out of Stock Colors
     val outOfStockIconColor = if (isDark) md_dashboard_low_stock_icon_dark else md_dashboard_out_of_stock_icon_light
     val outOfStockContainerColor = if (isDark) md_dashboard_out_of_stock_background_dark else md_dashboard_out_of_stock_background_light
 
-    var showMenu by remember { mutableStateOf(false) }
-
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -109,7 +101,7 @@ fun DashboardScreen(
                 },
                 actions = {
                     Box {
-                        IconButton(onClick = { showMenu = true }) {
+                        IconButton(onClick = { onMenuClick(true) }) {
                             Icon(
                                 imageVector = Icons.Outlined.MoreVert,
                                 contentDescription = "More Options",
@@ -118,12 +110,12 @@ fun DashboardScreen(
                         }
                         DropdownMenu(
                             expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+                            onDismissRequest = { onMenuClick(false) }
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Sign Out") },
                                 onClick = {
-                                    showMenu = false
+                                    onMenuClick(false)
                                     onSignOut()
                                 },
                                 leadingIcon = {
@@ -152,12 +144,10 @@ fun DashboardScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                // Main Overview Card
-                TotalItemsCard(count = (productList.count { !it.isDeleted }), onTotalItemsClicked = onTotalItemsClicked)
+                TotalItemsCard(count = totalItemsCount, onTotalItemsClicked = onViewAllProducts)
             }
 
             item {
-                // Warning / Alert Section
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -190,15 +180,9 @@ fun DashboardScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 QuickActionsGrid(
-                    onTransactionsClicked = {
-                        onTransactionsClicked()
-                    },
-                    onInventoryClicked = {
-                        onTotalItemsClicked()
-                    },
-                    onAddNewItemClicked = {
-                        onAddNewItemClicked()
-                    }
+                    onTransactionsClicked = onViewTransactions,
+                    onInventoryClicked = onViewAllProducts,
+                    onAddNewItemClicked = onAddNewProduct
                 )
             }
         }
@@ -421,13 +405,15 @@ fun QuickActionButton(
 private fun DashboardScreenPreview() {
     BazaarTheme {
         DashboardScreen(
-            productList = emptyList(),
-            onTransactionsClicked = {},
-            onTotalItemsClicked = {},
-            onAddNewItemClicked = {},
-            onSignOut = {},
-            lowStockCount = 0,
-            outOfStockCount = 0
+            totalItemsCount = 10,
+            lowStockCount = 2,
+            outOfStockCount = 1,
+            showMenu = false,
+            onMenuClick = {},
+            onViewAllProducts = {},
+            onViewTransactions = {},
+            onAddNewProduct = {},
+            onSignOut = {}
         )
     }
 }

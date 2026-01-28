@@ -4,5 +4,6 @@ import com.sujoy.model.Product
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionsRepository {
-    fun getProducts(): Flow<Result<List<Product>>>
+    fun getProducts(): Flow<List<Product>>
+    suspend fun updateProductInDB(productId: String, quantity: Int)
 }

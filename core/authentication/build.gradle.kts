@@ -3,18 +3,14 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
-    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.sujoy.authentication"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 27
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -40,45 +36,33 @@ android {
     buildFeatures {
         compose = true
     }
-
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-    }
 }
 
 dependencies {
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:common"))
+
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.material.icons.extended)
+
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    implementation(libs.lottie.compose)
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.play.services.auth)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.benchmark.common)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx) // For coroutines support (suspend functions)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.google.code.gson)
-    implementation(project(":core:designsystem"))
+    implementation(libs.lottie.compose)
 
-    // Unit Testing
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.google.truth)
-
-    // UI Testing
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
