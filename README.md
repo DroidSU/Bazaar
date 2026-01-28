@@ -1,3 +1,5 @@
+
+
 # Bazaar - Modern Inventory & Sales Management
 
 Bazaar is a production-grade Android application designed to streamline inventory management and sales tracking for small to medium-sized businesses. Built with a focus on technical excellence, it demonstrates modern Android development practices, including **Multi-module Clean Architecture**, **Jetpack Compose**, and **Offline-first capabilities**.
@@ -34,7 +36,7 @@ The project follows a modularized approach to ensure scalability, testability, a
 *   **`:core:designsystem`**: Centralized UI components, themes, and design tokens to ensure visual consistency.
 *   **`:core:authentication`**: Encapsulated logic for user identity and security.
 
-## 📈 Technical Highlights for Recruiters
+## 📈 Technical Highlights
 
 *   **Circular Dependency Resolution**: Successfully refactored the project from a monolithic factory pattern to Hilt DI to break dependency cycles and improve modularity.
 *   **Reactive UI**: leveraged `StateFlow` and `collectAsStateWithLifecycle` for efficient, lifecycle-aware UI updates.
