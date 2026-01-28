@@ -1,50 +1,46 @@
-# Bazaar 🛍️
+# Bazaar - Modern Inventory & Sales Management
 
-**Bazaar** is a modern and intuitive inventory management solution designed specifically for small business owners and warehouse managers. Say goodbye to cumbersome spreadsheets and outdated software—Bazaar brings a clean, fast, and user-friendly experience to your fingertips.
+Bazaar is a production-grade Android application designed to streamline inventory management and sales tracking for small to medium-sized businesses. Built with a focus on technical excellence, it demonstrates modern Android development practices, including **Multi-module Clean Architecture**, **Jetpack Compose**, and **Offline-first capabilities**.
 
-Built with the latest Android technologies, Bazaar helps you keep track of your products with ease, so you can focus on what truly matters: growing your business.
+## 🚀 Key Features
 
-##  Screenshots
+*   **Inventory Management**: Full CRUD operations for products with support for weight units, pricing, and automated stock threshold alerts.
+*   **Bulk Import**: Integrated CSV parser to allow users to upload large product datasets quickly via `ActivityResultContracts`.
+*   **Voice Search**: Hands-free product discovery using Android's `RecognizerIntent`.
+*   **Sales & Checkout**: A seamless transaction flow that auto-calculates totals and updates stock levels in real-time.
+*   **Secure Authentication**: Robust user onboarding via **Firebase Auth**, supporting both Google Sign-In and Phone OTP verification.
+*   **Dynamic Dashboard**: High-level overview of business health with real-time stock alerts (Low Stock/Out of Stock).
+*   **Neumorphic Design**: A modern, custom-built UI using Jetpack Compose with specialized neumorphic components for a unique user experience.
 
-![Bazaar App Screenshot](https://github.com/user-attachments/assets/daa7371a-3bdb-4cb8-bded-d7ebf79cb5df)
+## 🛠 Tech Stack
 
-## ✨ Key Features
+*   **Language**: Kotlin (100%)
+*   **UI Framework**: Jetpack Compose (Declarative UI)
+*   **Architecture**: Multi-module Clean Architecture with MVVM
+*   **Dependency Injection**: Hilt (Dagger)
+*   **Local Database**: Room (Offline-first support)
+*   **Backend**: Firebase (Firestore for cloud sync, Firebase Auth)
+*   **Asynchronous Flow**: Kotlin Coroutines & StateFlow
+*   **Build System**: Gradle Kotlin DSL with Version Catalogs (`libs.versions.toml`)
 
-Bazaar is designed to be both powerful and simple. Here are some of the core functions that make inventory management a breeze:
+## 🏗 Architecture Overview
 
-*   **Effortless Product Tracking**: Add, view, and manage all your products in one place. Capture essential details like name, quantity, price, and weight.
-*   **Intuitive Gestures**: A modern interface powered by Jetpack Compose allows for smooth interactions. Swipe to delete items and quickly access editing functions.
-*   **Clean & Modern UI**: A beautifully crafted interface that is easy to navigate, reducing clutter and helping you find what you need in seconds.
-*   **Voice-Powered Search**: Quickly find products using just your voice.
-*   **CSV Data Import**: Easily import your existing product lists from a CSV file to get started in no time.
-*   **Dynamic Product Details**: The app smartly displays product information, such as quantity and weight, and formats pricing into your local currency.
-*   **Elegant Card-Based Layout**: Each product is presented on its own card with clear, organized details and quick access to actions like "Edit."
-*   **Engaging Animations**: Enjoy a delightful user experience with subtle animations and Lottie-powered empty states.
+The project follows a modularized approach to ensure scalability, testability, and separation of concerns:
 
-## 🚀 Upcoming Features
+*   **`:app`**: The entry point, orchestrating navigation and global DI setup.
+*   **`:feature:*`**: Isolated functional modules (Dashboard, Products, Transactions) to reduce build times and improve code ownership.
+*   **`:core:data`**: The repository layer, managing data sources between Firestore and Room.
+*   **`:core:database`**: Local persistence layer using Room.
+*   **`:core:designsystem`**: Centralized UI components, themes, and design tokens to ensure visual consistency.
+*   **`:core:authentication`**: Encapsulated logic for user identity and security.
 
-We are constantly working to make Bazaar even better. Here are some of the features we're planning to introduce:
+## 📈 Technical Highlights for Recruiters
 
-*   **User Accounts & Authentication**: Secure your data with personal accounts and authentication.
-*   **Advanced Search & Filtering**: Filter products by category, date added, or other criteria.
-*   **Data Sync Across Devices**: Access your inventory from multiple devices.
-*   **Barcode/QR Code Scanning**: Add and manage products by scanning their codes.
-*   **Analytics and Reports**: Gain insights into your inventory with sales reports and stock analysis.
-
-## 🛠️ Tech Stack
-
-Bazaar is built with a modern Android tech stack:
-
-*   **Kotlin**: The primary programming language.
-*   **Jetpack Compose**: For building the user interface.
-*   **Material 3**: For modern UI components and styling.
-*   **Coroutines & Flow**: For asynchronous operations.
-*   **Lottie**: For beautiful animations.
-
-## 📄 License
-
-This project is All Rights Reserved. See the [LICENSE](LICENSE) file for details.
+*   **Circular Dependency Resolution**: Successfully refactored the project from a monolithic factory pattern to Hilt DI to break dependency cycles and improve modularity.
+*   **Reactive UI**: leveraged `StateFlow` and `collectAsStateWithLifecycle` for efficient, lifecycle-aware UI updates.
+*   **Custom Components**: Developed reusable Compose UI components like `NeumorphicTextField` and `PriceField` to maintain a consistent design language.
+*   **Efficient Data Handling**: Implemented a synchronization strategy between Firebase Firestore and local Room DB to provide a fast, offline-available experience.
 
 ---
 
-We hope you enjoy using Bazaar! If you have any feedback or feature requests, feel free to open an issue.
+**Bazaar** is a testament to writing maintainable, scalable, and high-performance Android applications using the latest industry standards.
