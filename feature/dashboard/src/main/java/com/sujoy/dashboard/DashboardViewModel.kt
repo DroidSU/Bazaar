@@ -6,14 +6,19 @@ import androidx.lifecycle.viewModelScope
 import com.sujoy.common.AppUIState
 import com.sujoy.data.repository.DashboardRepository
 import com.sujoy.model.Product
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DashboardViewModel(private val repository: DashboardRepository) : ViewModel() {
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
+    private val repository: DashboardRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow<AppUIState>(AppUIState.Loading)
     val uiState: StateFlow<AppUIState> = _uiState.asStateFlow()

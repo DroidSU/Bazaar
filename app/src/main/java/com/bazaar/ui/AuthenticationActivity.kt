@@ -18,12 +18,14 @@ import com.sujoy.authentication.data.AuthUiState
 import com.sujoy.authentication.ui.AuthenticationScreen
 import com.sujoy.authentication.vm.AuthViewModel
 import com.sujoy.designsystem.theme.BazaarTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "AuthenticationActivity"
 
+@AndroidEntryPoint
 class AuthenticationActivity : ComponentActivity() {
 
-    private val viewModel: AuthViewModel by viewModels { ViewModelFactory(applicationContext) }
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +35,6 @@ class AuthenticationActivity : ComponentActivity() {
                 val uiState by viewModel.uiState.collectAsState(AuthUiState.Idle)
                 val otpValue by viewModel.otpValue.collectAsState("")
                 val isOTPSent by viewModel.isOTPSent.collectAsState()
-                val timerValue by viewModel.timerValue.collectAsState(60)
 
                 if (uiState is AuthUiState.Success) {
                     val intent = Intent(this, DashboardActivity::class.java)

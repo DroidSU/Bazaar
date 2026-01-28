@@ -19,15 +19,13 @@ import com.sujoy.dashboard.DashboardScreen
 import com.sujoy.dashboard.DashboardViewModel
 import com.sujoy.designsystem.theme.BazaarTheme
 import com.sujoy.transactions.viewmodels.TransactionsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DashboardActivity : ComponentActivity() {
 
-    private val viewModel: DashboardViewModel by viewModels { ViewModelFactory(applicationContext) }
-    private val transactionsViewModel: TransactionsViewModel by viewModels {
-        ViewModelFactory(
-            applicationContext
-        )
-    }
+    private val viewModel: DashboardViewModel by viewModels()
+    private val transactionsViewModel: TransactionsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

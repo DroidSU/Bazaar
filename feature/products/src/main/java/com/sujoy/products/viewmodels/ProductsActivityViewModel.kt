@@ -11,6 +11,7 @@ import com.sujoy.designsystem.utils.WeightUnit
 import com.sujoy.model.Product
 import com.sujoy.products.SortOption
 import com.sujoy.products.models.UploadState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +22,13 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.UUID
+import javax.inject.Inject
 
-class ProductsActivityViewModel(private val repository: ProductRepository, private val productsDAO: ProductsDAO) : ViewModel() {
+@HiltViewModel
+class ProductsActivityViewModel @Inject constructor(
+    private val repository: ProductRepository,
+    private val productsDAO: ProductsDAO
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AppUIState>(AppUIState.Loading)
     val uiState = _uiState.asStateFlow()

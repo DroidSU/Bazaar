@@ -18,10 +18,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private const val TAG = "AuthRepositoryImpl"
 
-class AuthRepositoryImpl : AuthRepository {
+class AuthRepositoryImpl @Inject constructor() : AuthRepository {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 

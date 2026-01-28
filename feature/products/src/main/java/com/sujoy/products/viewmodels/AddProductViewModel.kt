@@ -9,9 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.sujoy.data.repository.ProductRepository
 import com.sujoy.designsystem.utils.WeightUnit
 import com.sujoy.model.Product
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddProductViewModel(private val repository: ProductRepository) : ViewModel() {
+@HiltViewModel
+class AddProductViewModel @Inject constructor(
+    private val repository: ProductRepository
+) : ViewModel() {
 
     var productName by mutableStateOf("")
     var productQuantity by mutableStateOf("")

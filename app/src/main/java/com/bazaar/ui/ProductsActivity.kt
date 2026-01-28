@@ -15,15 +15,13 @@ import com.sujoy.common.AppUIState
 import com.sujoy.designsystem.theme.BazaarTheme
 import com.sujoy.products.components.ProductScreen
 import com.sujoy.products.viewmodels.ProductsActivityViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
+@AndroidEntryPoint
 class ProductsActivity : ComponentActivity() {
 
-    private val viewModel: ProductsActivityViewModel by viewModels {
-        ViewModelFactory(
-            applicationContext
-        )
-    }
+    private val viewModel: ProductsActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

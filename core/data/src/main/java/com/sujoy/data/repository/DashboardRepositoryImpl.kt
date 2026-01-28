@@ -2,14 +2,16 @@ package com.sujoy.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.sujoy.database.dao.ProductsDAO
 import com.sujoy.model.Product
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import javax.inject.Inject
 
-class DashboardRepositoryImpl(private val productDAO : ProductsDAO) : DashboardRepository {
+class DashboardRepositoryImpl @Inject constructor(
+    private val productDAO : ProductsDAO
+) : DashboardRepository {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -22,7 +24,7 @@ class DashboardRepositoryImpl(private val productDAO : ProductsDAO) : DashboardR
         }
 
         val snapshotListener = db.collection("products").document(userId).collection("userProducts")
-            .orderBy("createdOn", Query.Direction.DESCENDING)
+            .orderBy("createdOn", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     trySend(Result.failure(error))

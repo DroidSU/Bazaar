@@ -7,7 +7,7 @@
     </queries>
 
     <application
-        android:name=".utils.CustomApplication"
+        android:name=".BazaarApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

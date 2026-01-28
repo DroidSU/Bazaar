@@ -11,10 +11,12 @@ import com.sujoy.designsystem.utils.WeightUnit
 import com.sujoy.model.Product
 import com.sujoy.products.components.EditProductScreen
 import com.sujoy.products.viewmodels.EditProductsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EditProductActivity : ComponentActivity() {
 
-    private val viewModel: EditProductsViewModel by viewModels { ViewModelFactory(applicationContext) }
+    private val viewModel: EditProductsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

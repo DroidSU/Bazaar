@@ -7,16 +7,18 @@ import com.sujoy.authentication.data.AuthUiState
 import com.sujoy.authentication.repository.AuthRepository
 import com.sujoy.authentication.repository.AuthResult
 import com.sujoy.authentication.repository.PhoneAuthEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-private const val TAG = "AuthViewModel"
 private const val RESEND_TIMEOUT = 60
 
-class AuthViewModel(
+@HiltViewModel
+class AuthViewModel @Inject constructor(
     private val repository: AuthRepository
 ) : ViewModel() {
 
@@ -39,13 +41,10 @@ class AuthViewModel(
     val phoneNumber = _phoneNumber.asStateFlow()
 
     private var resendTimerJob: Job? = null
-    private var authJob: Job? = null // New: To manage single auth process
+    private var authJob: Job? = null
 
-    /**
-     * Signs in the user using a given credential (from Google or Phone).
-     */
     fun signInWithCredential(credential: AuthCredential) {
-        authJob?.cancel() // Cancel previous attempts
+        authJob?.cancel()
         authJob = viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
 
@@ -73,7 +72,7 @@ class AuthViewModel(
             if (phoneNumber.startsWith("+")) phoneNumber else "+91$phoneNumber"
         _phoneNumber.value = formattedPhoneNumber
 
-        authJob?.cancel() // Cancel previous attempts
+        authJob?.cancel()
         authJob = viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
 
@@ -121,12 +120,11 @@ class AuthViewModel(
     private fun startResendTimer() {
         resendTimerJob?.cancel()
         resendTimerJob = viewModelScope.launch {
-            // Start from timeout down to 1
             for (i in RESEND_TIMEOUT downTo 1) {
                 _timerValue.value = i
                 delay(1000)
             }
-            _timerValue.value = 0 // Finished
+            _timerValue.value = 0
         }
     }
 

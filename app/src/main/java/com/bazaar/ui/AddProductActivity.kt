@@ -45,10 +45,12 @@ import com.sujoy.designsystem.theme.BazaarTheme
 import com.sujoy.designsystem.utils.WeightUnit
 import com.sujoy.products.components.QuantitySelector
 import com.sujoy.products.viewmodels.AddProductViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddProductActivity : ComponentActivity() {
 
-    private val viewModel: AddProductViewModel by viewModels { ViewModelFactory(applicationContext) }
+    private val viewModel: AddProductViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

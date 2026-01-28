@@ -7,6 +7,7 @@ import com.sujoy.database.dao.TransactionsDAO
 import com.sujoy.database.model.SaleItemEntity
 import com.sujoy.database.model.TransactionEntity
 import com.sujoy.model.Product
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface CheckoutState {
     data object Idle : CheckoutState
@@ -22,7 +24,8 @@ sealed interface CheckoutState {
     data class Error(val message: String) : CheckoutState
 }
 
-class TransactionsViewModel(
+@HiltViewModel
+class TransactionsViewModel @Inject constructor(
     private val repository: TransactionsRepository,
     private val transactionsDAO: TransactionsDAO
 ) : ViewModel() {

@@ -10,9 +10,11 @@ import androidx.compose.runtime.getValue
 import com.sujoy.designsystem.theme.BazaarTheme
 import com.sujoy.transactions.components.TransactionsScreen
 import com.sujoy.transactions.viewmodels.TransactionsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TransactionsActivity : ComponentActivity() {
-    private val viewModel: TransactionsViewModel by viewModels { ViewModelFactory(applicationContext) }
+    private val viewModel: TransactionsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
