@@ -2,8 +2,8 @@ package com.sujoy.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.sujoy.database.dao.ProductsDAO
-import com.sujoy.model.Product
+import com.sujoy.data.database.dao.ProductsDAO
+import com.sujoy.data.models.Product
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

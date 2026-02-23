@@ -52,12 +52,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sujoy.common.AppUIState
+import com.sujoy.data.models.Product
 import com.sujoy.designsystem.components.AdaptiveThresholdView
 import com.sujoy.designsystem.components.NeumorphicTextField
 import com.sujoy.designsystem.components.PriceField
 import com.sujoy.designsystem.components.WeightInput
 import com.sujoy.designsystem.utils.WeightUnit
-import com.sujoy.model.Product
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)

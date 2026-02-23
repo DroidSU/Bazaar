@@ -3,8 +3,8 @@ package com.sujoy.products.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sujoy.common.AppUIState
+import com.sujoy.data.models.Product
 import com.sujoy.data.repository.ProductRepository
-import com.sujoy.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

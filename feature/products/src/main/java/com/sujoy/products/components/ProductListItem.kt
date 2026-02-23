@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sujoy.data.models.Product
 import com.sujoy.designsystem.components.CornerRibbon
-import com.sujoy.model.Product
 import java.text.NumberFormat
 import java.util.Locale
 

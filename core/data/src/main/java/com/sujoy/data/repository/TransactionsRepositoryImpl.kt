@@ -1,7 +1,7 @@
 package com.sujoy.data.repository
 
-import com.sujoy.database.dao.ProductsDAO
-import com.sujoy.model.Product
+import com.sujoy.data.database.dao.ProductsDAO
+import com.sujoy.data.models.Product
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

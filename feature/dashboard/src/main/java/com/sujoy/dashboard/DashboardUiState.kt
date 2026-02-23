@@ -1,6 +1,6 @@
 package com.sujoy.dashboard
 
-import com.sujoy.model.Product
+import com.sujoy.data.models.Product
 
 data class DashboardUiState(
     val productList: List<Product> = emptyList(),

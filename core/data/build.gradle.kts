@@ -23,15 +23,19 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
     implementation(project(":core:common"))
-    implementation(project(":core:database"))
     
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.crashlytics)
     
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    implementation(libs.google.code.gson)
 }

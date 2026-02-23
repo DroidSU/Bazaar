@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -43,12 +44,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:data"))
-    implementation(project(":core:database"))
     implementation(project(":core:designsystem"))
-    implementation(project(":core:authentication"))
+    implementation(project(":feature:authentication"))
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:products"))
     implementation(project(":feature:transactions"))
@@ -65,6 +64,7 @@ dependencies {
 
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.crashlytics)
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
 

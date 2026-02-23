@@ -23,8 +23,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
     implementation(project(":core:common"))
+    implementation(project(":core:data"))
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

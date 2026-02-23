@@ -5,4 +5,6 @@ object ConstantsManager {
     const val DATABASE_NAME = "bazaar_database"
     const val TABLE_PRODUCTS = "products"
     const val TABLE_TRANSACTIONS = "transactions"
+
+    const val RESEND_TIMEOUT = 60
 }

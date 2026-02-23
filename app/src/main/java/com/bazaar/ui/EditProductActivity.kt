@@ -6,9 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
+import com.sujoy.data.models.Product
 import com.sujoy.designsystem.theme.BazaarTheme
 import com.sujoy.designsystem.utils.WeightUnit
-import com.sujoy.model.Product
 import com.sujoy.products.components.EditProductScreen
 import com.sujoy.products.viewmodels.EditProductsViewModel
 import dagger.hilt.android.AndroidEntryPoint

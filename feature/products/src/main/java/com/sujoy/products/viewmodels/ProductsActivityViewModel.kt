@@ -5,10 +5,10 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sujoy.common.AppUIState
+import com.sujoy.data.database.dao.ProductsDAO
+import com.sujoy.data.models.Product
 import com.sujoy.data.repository.ProductRepository
-import com.sujoy.database.dao.ProductsDAO
 import com.sujoy.designsystem.utils.WeightUnit
-import com.sujoy.model.Product
 import com.sujoy.products.SortOption
 import com.sujoy.products.models.UploadState
 import dagger.hilt.android.lifecycle.HiltViewModel

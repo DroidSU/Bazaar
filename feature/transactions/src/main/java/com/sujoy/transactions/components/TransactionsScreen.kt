@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.sujoy.database.model.SaleItemEntity
-import com.sujoy.model.Product
+import com.sujoy.data.models.Product
+import com.sujoy.data.models.SaleItemEntity
 import com.sujoy.transactions.viewmodels.CheckoutState
 import kotlinx.coroutines.flow.SharedFlow
 

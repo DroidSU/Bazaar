@@ -2,11 +2,11 @@ package com.sujoy.transactions.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sujoy.data.database.dao.TransactionsDAO
+import com.sujoy.data.models.Product
+import com.sujoy.data.models.SaleItemEntity
+import com.sujoy.data.models.TransactionEntity
 import com.sujoy.data.repository.TransactionsRepository
-import com.sujoy.database.dao.TransactionsDAO
-import com.sujoy.database.model.SaleItemEntity
-import com.sujoy.database.model.TransactionEntity
-import com.sujoy.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

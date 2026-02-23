@@ -14,9 +14,11 @@ import androidx.compose.runtime.getValue
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
-import com.sujoy.authentication.data.AuthUiState
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.sujoy.authentication.AuthUiState
 import com.sujoy.authentication.ui.AuthenticationScreen
 import com.sujoy.authentication.vm.AuthViewModel
+import com.sujoy.common.ConstantsManager
 import com.sujoy.designsystem.theme.BazaarTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -76,16 +78,17 @@ class AuthenticationActivity : ComponentActivity() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d(TAG, "Google Sign-In successful, getting credential.")
+                Log.d(ConstantsManager.APP_TAG, "Google Sign-In successful, getting credential.")
                 val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
                 viewModel.signInWithCredential(credential)
             } catch (e: ApiException) {
-                Log.w(TAG, "Google Sign-In failed.", e)
+                Log.e(ConstantsManager.APP_TAG, "Google Sign-In failed.", e)
                 Toast.makeText(this, "Google Sign-In failed: ${e.message}", Toast.LENGTH_LONG)
                     .show()
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         } else {
-            Log.w(TAG, "Google Sign-In flow was cancelled by user.")
+            Log.e(ConstantsManager.APP_TAG, "Google Sign-In flow was cancelled by user.")
         }
     }
 }
