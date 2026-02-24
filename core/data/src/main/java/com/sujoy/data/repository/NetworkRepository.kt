@@ -16,4 +16,6 @@ interface NetworkRepository{
     fun getPhoneAuthCredential(verificationId: String, otpCode: String): AuthCredential
     suspend fun getProducts(): Flow<Result<List<Product>>>
     suspend fun storeProductList(products: List<Product>)
+
+    suspend fun isNetworkAvailable() : Boolean
 }

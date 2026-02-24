@@ -20,6 +20,12 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    
+    sourceSets {
+        getByName("main") {
+            manifest.srcFile("src/main/AndroidManifest.xml")
+        }
+    }
 }
 
 dependencies {

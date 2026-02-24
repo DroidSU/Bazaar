@@ -49,6 +49,7 @@ class AuthenticationActivity : ComponentActivity() {
                     onGoogleSignIn = {
                     },
                     onPhoneSignIn = {
+
                         viewModel.sendOtp(it)
                     },
                     onVerifyOtp = {
@@ -66,6 +67,9 @@ class AuthenticationActivity : ComponentActivity() {
                     onResendOtp = {
                         viewModel.resendOtp()
                     },
+                    onGoBack = {
+//                        viewModel.goBackToOTP()
+                    }
                 )
             }
         }

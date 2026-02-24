@@ -1,5 +1,8 @@
 package com.sujoy.data.repository
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.AuthCredential
@@ -12,26 +15,33 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.sujoy.common.ConstantsManager
 import com.sujoy.data.models.PhoneAuthEvent
 import com.sujoy.data.models.Product
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class NetworkRepositoryImpl @Inject constructor() : NetworkRepository {
+class NetworkRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context
+) : NetworkRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     override suspend fun signInWithCredentials(credential: AuthCredential): NetworkResult =
         try {
-        auth.signInWithCredential(credential).await()
-        NetworkResult.Success(null)
-    }
-        catch (e: FirebaseAuthException) {
-        Log.e(ConstantsManager.APP_TAG, "Firebase sign-in failed: ${e.errorCode}", e)
-        FirebaseCrashlytics.getInstance().recordException(e)
-        NetworkResult.Error(e.message ?: "An unknown authentication error occurred.")
-    }
+            auth.signInWithCredential(credential).await()
+            NetworkResult.Success(null)
+        } catch (e: FirebaseAuthException) {
+            Log.e(ConstantsManager.APP_TAG, "Firebase sign-in failed: ${e.errorCode}", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+            NetworkResult.Error(e.message ?: "An unknown authentication error occurred.")
+        }
 
     override fun sendVerificationCode(
         phoneNumber: String
@@ -44,7 +54,8 @@ class NetworkRepositoryImpl @Inject constructor() : NetworkRepository {
 
             override fun onVerificationFailed(e: FirebaseException) {
                 trySend(PhoneAuthEvent.Error(e.message ?: "Verification failed"))
-                FirebaseCrashlytics.getInstance().log("callbackFlow for sendVerificationCode closed.")
+                FirebaseCrashlytics.getInstance()
+                    .log("callbackFlow for sendVerificationCode closed.")
             }
 
             override fun onCodeSent(
@@ -78,6 +89,36 @@ class NetworkRepositoryImpl @Inject constructor() : NetworkRepository {
 
     override suspend fun storeProductList(products: List<Product>) {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun isNetworkAvailable(): Boolean = withContext(Dispatchers.IO) {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return@withContext false
+        val activeNetwork =
+            connectivityManager.getNetworkCapabilities(network) ?: return@withContext false
+
+        val isConnected = when {
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
+
+        if (isConnected) {
+            try {
+                val timeoutMs = 1500
+                val socket = Socket()
+                val socketAddress = InetSocketAddress("8.8.8.8", 53)
+                socket.connect(socketAddress, timeoutMs)
+                socket.close()
+                true
+            } catch (e: IOException) {
+                false
+            }
+        } else {
+            false
+        }
     }
 
 }

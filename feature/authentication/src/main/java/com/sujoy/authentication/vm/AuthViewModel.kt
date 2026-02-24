@@ -74,23 +74,28 @@ class AuthViewModel @Inject constructor(
         authJob = viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
 
-            networkRepository.sendVerificationCode(formattedPhoneNumber).collect { event ->
-                when (event) {
-                    is PhoneAuthEvent.CodeSent -> {
-                        _uiState.value = AuthUiState.Idle
-                        _verificationId.value = event.verificationId
-                        _isOTPSent.value = true
-                        startResendTimer()
-                    }
+            if(networkRepository.isNetworkAvailable()) {
+                networkRepository.sendVerificationCode(formattedPhoneNumber).collect { event ->
+                    when (event) {
+                        is PhoneAuthEvent.CodeSent -> {
+                            _uiState.value = AuthUiState.Idle
+                            _verificationId.value = event.verificationId
+                            _isOTPSent.value = true
+                            startResendTimer()
+                        }
 
-                    is PhoneAuthEvent.VerificationCompleted -> {
-                        signInWithCredential(event.credential)
-                    }
+                        is PhoneAuthEvent.VerificationCompleted -> {
+                            signInWithCredential(event.credential)
+                        }
 
-                    is PhoneAuthEvent.Error -> {
-                        _uiState.value = AuthUiState.Error(event.message)
+                        is PhoneAuthEvent.Error -> {
+                            _uiState.value = AuthUiState.Error(event.message)
+                        }
                     }
                 }
+            }
+            else{
+                _uiState.value = AuthUiState.Error("No Internet Connection")
             }
         }
     }
@@ -140,9 +145,19 @@ class AuthViewModel @Inject constructor(
         _otpValue.value = ""
     }
 
+//    fun goBackToOTP() {
+//        _isOTPSent.value = false
+//        _timerValue.value = RESEND_TIMEOUT
+//        _otpValue.value = ""
+//        _verificationId.value = ""
+//        _uiState.value = AuthUiState.Idle
+//    }
+
     override fun onCleared() {
         super.onCleared()
         authJob?.cancel()
         resendTimerJob?.cancel()
     }
+
+
 }

@@ -6,6 +6,8 @@ import com.sujoy.data.database.dao.ProductsDAO
 import com.sujoy.data.database.dao.TransactionsDAO
 import com.sujoy.data.repository.DashboardRepository
 import com.sujoy.data.repository.DashboardRepositoryImpl
+import com.sujoy.data.repository.DatabaseRepository
+import com.sujoy.data.repository.DatabaseRepositoryImpl
 import com.sujoy.data.repository.NetworkRepository
 import com.sujoy.data.repository.NetworkRepositoryImpl
 import com.sujoy.data.repository.ProductRepository
@@ -29,6 +31,12 @@ abstract class DIModule {
     abstract fun bindNetworkRepository(
         networkRepositoryImpl: NetworkRepositoryImpl
     ): NetworkRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDatabaseRepository(
+        databaseRepositoryImpl: DatabaseRepositoryImpl
+    ): DatabaseRepository
 
     @Binds
     @Singleton

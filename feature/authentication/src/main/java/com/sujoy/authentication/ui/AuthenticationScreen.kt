@@ -18,8 +18,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,16 +49,29 @@ fun AuthenticationScreen(
     isOTPSent: Boolean,
     timerValue: Int,
     onOTPChanged: (String) -> Unit,
-    otpCode: String
+    otpCode: String,
+    onGoBack: () -> Unit
 ) {
     val lottieComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(DesignR.raw.anim_welcome))
     val lottieProgress by animateLottieCompositionAsState(composition = lottieComposition, iterations = LottieConstants.IterateForever)
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState) {
+        if (uiState is AuthUiState.Error) {
+            snackbarHostState.showSnackbar(
+                message = uiState.message,
+                withDismissAction = true
+            )
+            onResetAuthFlow()
+        }
+    }
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (uiState is AuthUiState.Loading) {
@@ -133,7 +150,8 @@ private fun AuthenticationScreenPreview() {
             isOTPSent = false,
             timerValue = 0,
             onOTPChanged = {},
-            otpCode = ""
+            otpCode = "",
+            onGoBack = {}
         )
     }
 }

@@ -5,7 +5,7 @@ import com.google.firebase.auth.AuthCredential
 import com.sujoy.authentication.AuthUiState
 import com.sujoy.authentication.repository.AuthRepository
 import com.sujoy.authentication.repository.AuthResult
-import com.sujoy.authentication.repository.PhoneAuthEvent
+import com.sujoy.data.models.PhoneAuthEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
