@@ -6,6 +6,9 @@ import com.google.firebase.auth.AuthCredential
 import com.sujoy.authentication.AuthUiState
 import com.sujoy.common.ConstantsManager.RESEND_TIMEOUT
 import com.sujoy.data.models.PhoneAuthEvent
+import com.sujoy.data.models.Product
+import com.sujoy.data.models.UserEntity
+import com.sujoy.data.repository.DatabaseRepository
 import com.sujoy.data.repository.NetworkRepository
 import com.sujoy.data.repository.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val networkRepository: NetworkRepository
+    private val networkRepository: NetworkRepository,
+    private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -42,6 +46,13 @@ class AuthViewModel @Inject constructor(
     private var resendTimerJob: Job? = null
     private var authJob: Job? = null
 
+    private val _productsList = MutableStateFlow<List<Product>>(emptyList())
+    val productsList = _productsList.asStateFlow()
+
+    private val _userData = MutableStateFlow(UserEntity())
+    val userData = _userData.asStateFlow()
+
+
     fun signInWithCredential(credential: AuthCredential) {
         authJob?.cancel()
         authJob = viewModelScope.launch {
@@ -51,6 +62,13 @@ class AuthViewModel @Inject constructor(
                 is NetworkResult.Success -> {
                     _verificationId.value = ""
                     _isOTPSent.value = false
+
+                    if(networkRepository.getCurrentUser() != null) {
+                        fetchUserDetails()
+                        fetchProductsList()
+                    }
+
+
                     _uiState.value = AuthUiState.Success
                 }
 
@@ -145,13 +163,21 @@ class AuthViewModel @Inject constructor(
         _otpValue.value = ""
     }
 
-//    fun goBackToOTP() {
-//        _isOTPSent.value = false
-//        _timerValue.value = RESEND_TIMEOUT
-//        _otpValue.value = ""
-//        _verificationId.value = ""
-//        _uiState.value = AuthUiState.Idle
-//    }
+    fun fetchUserDetails() {
+        viewModelScope.launch {
+            networkRepository.getUserDetails().collect {
+                _userData.value = it
+            }
+        }
+    }
+
+    fun fetchProductsList() {
+        viewModelScope.launch {
+            networkRepository.getProducts().collect {
+                databaseRepository.addProductsToLocal(it)
+            }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()
