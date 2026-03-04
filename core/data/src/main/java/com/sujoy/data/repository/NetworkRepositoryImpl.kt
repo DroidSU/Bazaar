@@ -180,4 +180,32 @@ class NetworkRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun doesUserExist(userId : String): Boolean {
+        try {
+            val userDoc = db.collection("users").document(userId).get().await()
+            if (userDoc.exists()) {
+                return true
+            }
+        } catch (e: Exception) {
+            Log.e(ConstantsManager.APP_TAG, "Error checking/creating user", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
+
+        return false
+    }
+
+
+    override suspend fun createUser(user: UserEntity) {
+        try {
+            db.collection("users").document(user.userId).set(user).await()
+        } catch (e: Exception) {
+            Log.e(ConstantsManager.APP_TAG, "Error creating user", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
+    }
+
+    override fun signOut() {
+        auth.signOut()
+    }
+
 }

@@ -23,4 +23,10 @@ interface NetworkRepository{
 
     fun getCurrentUser() = FirebaseAuth.getInstance().currentUser
     fun getUserDetails() : Flow<UserEntity>
+
+    suspend fun doesUserExist(userId: String) : Boolean
+
+    suspend fun createUser(user: UserEntity)
+
+    fun signOut()
 }

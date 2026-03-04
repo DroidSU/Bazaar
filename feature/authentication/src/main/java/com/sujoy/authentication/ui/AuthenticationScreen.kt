@@ -50,7 +50,6 @@ fun AuthenticationScreen(
     timerValue: Int,
     onOTPChanged: (String) -> Unit,
     otpCode: String,
-    onGoBack: () -> Unit
 ) {
     val lottieComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(DesignR.raw.anim_welcome))
     val lottieProgress by animateLottieCompositionAsState(composition = lottieComposition, iterations = LottieConstants.IterateForever)
@@ -151,7 +150,6 @@ private fun AuthenticationScreenPreview() {
             timerValue = 0,
             onOTPChanged = {},
             otpCode = "",
-            onGoBack = {}
         )
     }
 }

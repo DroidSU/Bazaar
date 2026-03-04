@@ -2,23 +2,15 @@ package com.bazaar.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.sujoy.authentication.AuthUiState
 import com.sujoy.authentication.ui.AuthenticationScreen
 import com.sujoy.authentication.vm.AuthViewModel
-import com.sujoy.common.ConstantsManager
 import com.sujoy.designsystem.theme.BazaarTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -49,7 +41,6 @@ class AuthenticationActivity : ComponentActivity() {
                     onGoogleSignIn = {
                     },
                     onPhoneSignIn = {
-
                         viewModel.sendOtp(it)
                     },
                     onVerifyOtp = {
@@ -66,33 +57,9 @@ class AuthenticationActivity : ComponentActivity() {
                     otpCode = otpValue,
                     onResendOtp = {
                         viewModel.resendOtp()
-                    },
-                    onGoBack = {
-//                        viewModel.goBackToOTP()
                     }
                 )
             }
-        }
-    }
-
-    private val googleSignInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)!!
-                Log.d(ConstantsManager.APP_TAG, "Google Sign-In successful, getting credential.")
-                val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-                viewModel.signInWithCredential(credential)
-            } catch (e: ApiException) {
-                Log.e(ConstantsManager.APP_TAG, "Google Sign-In failed.", e)
-                Toast.makeText(this, "Google Sign-In failed: ${e.message}", Toast.LENGTH_LONG)
-                    .show()
-                FirebaseCrashlytics.getInstance().recordException(e)
-            }
-        } else {
-            Log.e(ConstantsManager.APP_TAG, "Google Sign-In flow was cancelled by user.")
         }
     }
 }

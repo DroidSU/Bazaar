@@ -7,8 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,28 +42,26 @@ class DashboardActivity : ComponentActivity() {
 
                 var showMenu by remember { mutableStateOf(false) }
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    DashboardScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        totalItemsCount = productList.size,
-                        lowStockCount = lowStockCount,
-                        outOfStockCount = outOfStockCount,
-                        showMenu = showMenu,
-                        onMenuClick = { showMenu = it },
-                        onViewAllProducts = {
-                            startActivity(Intent(this, ProductsActivity::class.java))
-                        },
-                        onViewTransactions = {
-                            startActivity(Intent(this, TransactionsActivity::class.java))
-                        },
-                        onAddNewProduct = {
-                            startActivity(Intent(this, AddProductActivity::class.java))
-                        },
-                        onSignOut = {
-                            viewModel.onSignOut()
-                        }
-                    )
-                }
+                DashboardScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    totalItemsCount = productList.size,
+                    lowStockCount = lowStockCount,
+                    outOfStockCount = outOfStockCount,
+                    showMenu = showMenu,
+                    onMenuClick = { showMenu = it },
+                    onViewAllProducts = {
+                        startActivity(Intent(this, ProductsActivity::class.java))
+                    },
+                    onViewTransactions = {
+                        startActivity(Intent(this, TransactionsActivity::class.java))
+                    },
+                    onAddNewProduct = {
+                        startActivity(Intent(this, AddProductActivity::class.java))
+                    },
+                    onSignOut = {
+                        viewModel.onSignOut()
+                    }
+                )
             }
         }
     }

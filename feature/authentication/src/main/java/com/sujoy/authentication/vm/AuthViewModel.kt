@@ -7,6 +7,7 @@ import com.sujoy.authentication.AuthUiState
 import com.sujoy.common.ConstantsManager.RESEND_TIMEOUT
 import com.sujoy.data.models.PhoneAuthEvent
 import com.sujoy.data.models.Product
+import com.sujoy.data.models.SyncState
 import com.sujoy.data.models.UserEntity
 import com.sujoy.data.repository.DatabaseRepository
 import com.sujoy.data.repository.NetworkRepository
@@ -63,13 +64,25 @@ class AuthViewModel @Inject constructor(
                     _verificationId.value = ""
                     _isOTPSent.value = false
 
-                    if(networkRepository.getCurrentUser() != null) {
-                        fetchUserDetails()
-                        fetchProductsList()
-                    }
-
-
                     _uiState.value = AuthUiState.Success
+
+                    val currentUser = networkRepository.getCurrentUser()
+                    if (currentUser != null) {
+                        if(networkRepository.doesUserExist(currentUser.uid)){
+                            fetchUserDetails()
+                            fetchProductsList()
+                        }
+                        else{
+                            networkRepository.createUser(
+                                UserEntity(
+                                    userId = currentUser.uid,
+                                    mobileNumber = currentUser.phoneNumber ?: "",
+                                    lastSyncTimestamp = System.currentTimeMillis(),
+                                    syncState = SyncState.SYNCED
+                                )
+                            )
+                        }
+                    }
                 }
 
                 is NetworkResult.Error -> {
@@ -92,7 +105,7 @@ class AuthViewModel @Inject constructor(
         authJob = viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
 
-            if(networkRepository.isNetworkAvailable()) {
+            if(true) {
                 networkRepository.sendVerificationCode(formattedPhoneNumber).collect { event ->
                     when (event) {
                         is PhoneAuthEvent.CodeSent -> {
@@ -103,7 +116,7 @@ class AuthViewModel @Inject constructor(
                         }
 
                         is PhoneAuthEvent.VerificationCompleted -> {
-                            signInWithCredential(event.credential)
+//                            signInWithCredential(event.credential)
                         }
 
                         is PhoneAuthEvent.Error -> {

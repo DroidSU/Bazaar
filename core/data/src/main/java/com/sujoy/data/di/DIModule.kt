@@ -4,8 +4,6 @@ import android.content.Context
 import com.sujoy.data.database.AppDatabase
 import com.sujoy.data.database.dao.ProductsDAO
 import com.sujoy.data.database.dao.TransactionsDAO
-import com.sujoy.data.repository.DashboardRepository
-import com.sujoy.data.repository.DashboardRepositoryImpl
 import com.sujoy.data.repository.DatabaseRepository
 import com.sujoy.data.repository.DatabaseRepositoryImpl
 import com.sujoy.data.repository.NetworkRepository
@@ -43,12 +41,6 @@ abstract class DIModule {
     abstract fun bindProductRepository(
         productRepositoryImpl: ProductRepositoryImpl
     ): ProductRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindDashboardRepository(
-        dashboardRepositoryImpl: DashboardRepositoryImpl
-    ): DashboardRepository
 
     @Binds
     @Singleton

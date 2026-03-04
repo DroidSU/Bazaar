@@ -1,23 +1,23 @@
 package com.sujoy.dashboard
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.sujoy.common.AppUIState
 import com.sujoy.data.models.Product
-import com.sujoy.data.repository.DashboardRepository
+import com.sujoy.data.repository.DatabaseRepository
+import com.sujoy.data.repository.NetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val repository: DashboardRepository
+    private val databaseRepository: DatabaseRepository,
+    private val networkRepository: NetworkRepository,
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow<AppUIState>(AppUIState.Loading)
@@ -42,39 +42,24 @@ class DashboardViewModel @Inject constructor(
     private fun collectProducts() {
         viewModelScope.launch {
             _uiState.value = AppUIState.Loading
-            repository.getProducts()
-                .catch { exception ->
-                    Log.e("Bazaar", "collectProducts: ${exception.message.toString()}")
-                    _uiState.value = AppUIState.Error(exception.message ?: "Unknown error")
+            try{
+                databaseRepository.getProductsFromLocal().collect { products ->
+                    _productList.value = products
+                    _lowStockCount.value = products.count { it.quantity > 0 && it.quantity < it.thresholdValue }
+                    _outOfStockCount.value = products.count { it.quantity == 0 }
+                    _uiState.value = AppUIState.Success
                 }
-                .collect { result ->
-                    result.onSuccess { products ->
-                        _productList.value = products
-                        _lowStockCount.value = products.count { it.quantity > 0 && it.quantity < it.thresholdValue }
-                        _outOfStockCount.value = products.count { it.quantity == 0 }
-                        _uiState.value = AppUIState.Success
-                        storeProductsInDB(products)
-                    }.onFailure { exception ->
-                        _uiState.value = AppUIState.Error(exception.message ?: "Unknown error")
-                        Log.e("Bazaar", "collectProducts: ${exception.message.toString()}")
-                    }
-                }
-        }
-    }
-
-    private fun storeProductsInDB(productsList: List<Product>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                repository.storeProductList(productsList)
-            } catch (e: Exception) {
-                Log.e("Bazaar", "storeProductsInDB: Error saving to DB", e)
+            }
+            catch (ex : Exception) {
+                _uiState.value = AppUIState.Error(ex.message ?: "Unknown error")
+                FirebaseCrashlytics.getInstance().recordException(ex)
             }
         }
     }
 
     fun onSignOut() {
         viewModelScope.launch {
-            repository.signOut()
+            networkRepository.signOut()
             _isSignedOut.value = true
         }
     }
