@@ -12,12 +12,13 @@ import com.sujoy.data.database.dao.Converters
 import com.sujoy.data.database.dao.ProductsDAO
 import com.sujoy.data.database.dao.TransactionsDAO
 import com.sujoy.data.models.Product
+import com.sujoy.data.models.SyncState
 import com.sujoy.data.models.TransactionEntity
 import com.sujoy.data.models.UserEntity
 
 @Database(
     entities = [Product::class, TransactionEntity::class, UserEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -42,6 +43,19 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             }
         }
+        
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE `${ConstantsManager.TABLE_PRODUCTS}` " +
+                            "ADD COLUMN `syncState` TEXT NOT NULL DEFAULT '${SyncState.PENDING.name}'"
+                )
+                db.execSQL(
+                    "ALTER TABLE `${ConstantsManager.TABLE_TRANSACTIONS}` " +
+                            "ADD COLUMN `syncState` TEXT NOT NULL DEFAULT '${SyncState.PENDING.name}'"
+                )
+            }
+        }
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -50,8 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     ConstantsManager.DATABASE_NAME
                 )
-                    .addMigrations(MIGRATION_1_2)
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance

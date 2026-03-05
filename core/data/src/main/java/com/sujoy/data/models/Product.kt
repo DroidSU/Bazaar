@@ -3,6 +3,7 @@ package com.sujoy.data.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.sujoy.common.ConstantsManager
+import com.sujoy.common.WeightUnit
 
 @Entity(tableName = ConstantsManager.TABLE_PRODUCTS)
 data class Product(
@@ -17,4 +18,5 @@ data class Product(
     var isDeleted: Boolean = false,
     var lastUpdated: Long = 0,
     var thresholdValue: Double = 0.0,
+    var syncState: SyncState = SyncState.PENDING
 )

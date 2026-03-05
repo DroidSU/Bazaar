@@ -1,4 +1,4 @@
-package com.sujoy.data.models
+package com.sujoy.common
 
 enum class WeightUnit {
     GM,

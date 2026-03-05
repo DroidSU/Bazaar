@@ -2,11 +2,18 @@ package com.sujoy.data.repository
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.sujoy.data.database.dao.ProductsDAO
+import com.sujoy.data.database.dao.TransactionsDAO
 import com.sujoy.data.models.Product
+import com.sujoy.data.models.TransactionEntity
+import com.sujoy.data.workers.SyncManager
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class DatabaseRepositoryImpl @Inject constructor(private val productDAO: ProductsDAO) :
+class DatabaseRepositoryImpl @Inject constructor(
+    private val productDAO: ProductsDAO,
+    private val transactionDAO: TransactionsDAO,
+    private val syncManager: SyncManager
+) :
     DatabaseRepository {
 
     override fun getProductsFromLocal(): Flow<List<Product>> {
@@ -14,16 +21,49 @@ class DatabaseRepositoryImpl @Inject constructor(private val productDAO: Product
     }
 
     override suspend fun addProductsToLocal(products: List<Product>): Result<Unit> {
-        try {
+        return try {
             if (products.isNotEmpty()) {
                 productDAO.insertProducts(products)
-                return Result.success(Unit)
+                Result.success(Unit)
             } else {
-                return Result.failure(Exception("Empty List"))
+                Result.failure(Exception("Empty List"))
             }
         } catch (ex: Exception) {
             FirebaseCrashlytics.getInstance().recordException(ex)
-            return Result.failure(ex)
+            Result.failure(ex)
+        }
+    }
+
+    override suspend fun addProductToDB(product: Product): Result<Unit> {
+        return try {
+            productDAO.insertProduct(product)
+            syncManager.scheduleSync()
+            Result.success(Unit)
+        } catch (ex: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(ex)
+            Result.failure(ex)
+        }
+    }
+
+    override suspend fun updateProductInDB(product: Product): Result<Unit> {
+        return try {
+            productDAO.updateProduct(product)
+            syncManager.scheduleSync()
+            Result.success(Unit)
+        } catch (ex: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(ex)
+            Result.failure(ex)
+        }
+    }
+
+    override suspend fun createTransaction(transaction: TransactionEntity) : Result<Unit>{
+        return try {
+            transactionDAO.insertTransaction(transaction)
+            syncManager.scheduleSync()
+            Result.success(Unit)
+        } catch (ex: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(ex)
+            Result.failure(ex)
         }
     }
 }

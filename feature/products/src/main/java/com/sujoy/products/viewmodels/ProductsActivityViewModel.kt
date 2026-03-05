@@ -4,10 +4,10 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.sujoy.common.AppUIState
-import com.sujoy.data.database.dao.ProductsDAO
 import com.sujoy.data.models.Product
-import com.sujoy.data.repository.ProductRepository
+import com.sujoy.data.repository.DatabaseRepository
 import com.sujoy.designsystem.utils.WeightUnit
 import com.sujoy.products.SortOption
 import com.sujoy.products.models.UploadState
@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
@@ -26,8 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductsActivityViewModel @Inject constructor(
-    private val repository: ProductRepository,
-    private val productsDAO: ProductsDAO
+    private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AppUIState>(AppUIState.Loading)
@@ -53,19 +51,16 @@ class ProductsActivityViewModel @Inject constructor(
 
     private fun getProductsFromDB() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getProducts()
-                .catch { exception ->
-                    _uiState.value =
-                        AppUIState.Error(exception.message ?: "An unknown error occurred")
-                }
-                .collect { result ->
-                result.onSuccess { products ->
+            try {
+                databaseRepository.getProductsFromLocal().collect { products ->
                     originalProducts = products.filter { !it.isDeleted }
                     filterProducts()
-                }.onFailure {
-                    _uiState.value =
-                        AppUIState.Error(it.message ?: "An unknown error occurred")
                 }
+            }
+            catch (ex : Exception) {
+                _uiState.value =
+                    AppUIState.Error(ex.message ?: "An unknown error occurred")
+                FirebaseCrashlytics.getInstance().recordException(ex)
             }
         }
     }
@@ -112,13 +107,14 @@ class ProductsActivityViewModel @Inject constructor(
                 }
 
                 products.forEachIndexed { index, product ->
-                    repository.addProducts(product)
+//                    repository.addProducts(product)
+                    databaseRepository.addProductToDB(product)
                     val progress = ((index + 1) * 100 / products.size)
                     _uploadState.value = UploadState.Uploading(progress)
                 }
 
                 _uploadState.value = UploadState.Success
-                delay(2000)
+                delay(1000)
                 _uploadState.value = UploadState.Idle
 
             } catch (e: Exception) {
@@ -163,7 +159,14 @@ class ProductsActivityViewModel @Inject constructor(
 
     fun onDeleteProduct(product: Product) {
         viewModelScope.launch {
-            repository.updateProduct(product.copy(isDeleted = true))
+            try{
+                databaseRepository.updateProductInDB(product.copy(isDeleted = true))
+            }
+            catch (ex : Exception) {
+                _uiState.value =
+                    AppUIState.Error(ex.message ?: "An unknown error occurred")
+                FirebaseCrashlytics.getInstance().recordException(ex)
+            }
         }
     }
 

@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sujoy.data.models.Product
-import com.sujoy.data.repository.ProductRepository
+import com.sujoy.data.repository.DatabaseRepository
 import com.sujoy.designsystem.utils.WeightUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddProductViewModel @Inject constructor(
-    private val repository: ProductRepository
+    private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
     var productName by mutableStateOf("")
@@ -82,7 +82,7 @@ class AddProductViewModel @Inject constructor(
                     thresholdValue = productThreshold,
                     lastUpdated = timeStamp
                 )
-                val result = repository.addProducts(product)
+                val result = databaseRepository.addProductToDB(product)
                 result.onSuccess {
                     onSuccess()
                 }.onFailure {

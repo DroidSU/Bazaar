@@ -2,11 +2,11 @@ package com.sujoy.transactions.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sujoy.data.database.dao.TransactionsDAO
+import com.sujoy.common.CheckoutState
 import com.sujoy.data.models.Product
 import com.sujoy.data.models.SaleItemEntity
 import com.sujoy.data.models.TransactionEntity
-import com.sujoy.data.repository.TransactionsRepository
+import com.sujoy.data.repository.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,20 +14,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface CheckoutState {
-    data object Idle : CheckoutState
-    data object Success : CheckoutState
-    data class Error(val message: String) : CheckoutState
-}
-
 @HiltViewModel
 class TransactionsViewModel @Inject constructor(
-    private val repository: TransactionsRepository,
-    private val transactionsDAO: TransactionsDAO
+    private val databaseRepository: DatabaseRepository,
 ) : ViewModel() {
 
     private val _productList = MutableStateFlow<List<Product>>(emptyList())
@@ -57,11 +49,9 @@ class TransactionsViewModel @Inject constructor(
 
     private fun loadProducts() {
         viewModelScope.launch {
-            repository.getProducts()
-                .catch { /* Handle error */ }
-                .collect { products ->
-                    _productList.value = products.filter { !it.isDeleted }
-                }
+            databaseRepository.getProductsFromLocal().collect { products ->
+                _productList.value = products.filter { !it.isDeleted }
+            }
         }
     }
 
@@ -122,12 +112,12 @@ class TransactionsViewModel @Inject constructor(
                 createdOn = System.currentTimeMillis()
             )
 
-            transactionsDAO.insertTransaction(transaction)
+            databaseRepository.createTransaction(transaction)
 
             _salesList.value.forEach { saleItem ->
                 val product = _productList.value.find { it.id == saleItem.productId }
                 product?.let {
-                    repository.updateProductInDB(it.id, (product.quantity - saleItem.quantity))
+                    databaseRepository.updateProductInDB(it.copy(quantity = (it.quantity - saleItem.quantity)))
                 }
             }
 

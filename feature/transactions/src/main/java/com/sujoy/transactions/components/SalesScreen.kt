@@ -47,10 +47,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.sujoy.common.CheckoutState
 import com.sujoy.data.models.Product
 import com.sujoy.data.models.SaleItemEntity
 import com.sujoy.designsystem.components.SuccessDialog
-import com.sujoy.transactions.viewmodels.CheckoutState
 import kotlinx.coroutines.flow.SharedFlow
 
 @OptIn(ExperimentalMaterial3Api::class)

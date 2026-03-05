@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sujoy.common.AppUIState
 import com.sujoy.data.models.Product
-import com.sujoy.data.repository.ProductRepository
+import com.sujoy.data.repository.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditProductsViewModel @Inject constructor(
-    private val repository: ProductRepository
+    private val databaseRepository: DatabaseRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AppUIState>(AppUIState.Idle)
@@ -23,7 +23,7 @@ class EditProductsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = AppUIState.Loading
 
-            val result = repository.updateProduct(product)
+            val result = databaseRepository.updateProductInDB(product)
             result.onSuccess {
                 _uiState.value = AppUIState.Success
             }.onFailure {

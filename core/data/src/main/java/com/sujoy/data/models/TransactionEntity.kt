@@ -9,7 +9,8 @@ data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val transactionsId: Long = 0,
     var itemsList: List<SaleItemEntity>,
     var totalAmount: Double,
-    var createdOn: Long
+    var createdOn: Long,
+    var syncState: SyncState = SyncState.PENDING
 )
 
 data class SaleItemEntity(

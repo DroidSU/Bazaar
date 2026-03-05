@@ -14,9 +14,9 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sujoy.common.ConstantsManager
-import com.sujoy.data.database.dao.ProductsDAO
 import com.sujoy.data.models.PhoneAuthEvent
 import com.sujoy.data.models.Product
+import com.sujoy.data.models.TransactionEntity
 import com.sujoy.data.models.UserEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,6 @@ import javax.inject.Inject
 
 class NetworkRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val productsDAO: ProductsDAO
 ) : NetworkRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -110,10 +109,6 @@ class NetworkRepositoryImpl @Inject constructor(
         awaitClose {
             listenerRegistration.remove()
         }
-    }
-
-    override suspend fun storeProductList(products: List<Product>) {
-        TODO("Not yet implemented")
     }
 
     override suspend fun isNetworkAvailable(): Boolean = withContext(Dispatchers.IO) {
@@ -202,6 +197,18 @@ class NetworkRepositoryImpl @Inject constructor(
             Log.e(ConstantsManager.APP_TAG, "Error creating user", e)
             FirebaseCrashlytics.getInstance().recordException(e)
         }
+    }
+
+    override suspend fun storeProductList(products: List<Product>) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateProduct(product: Product) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun createTransactionsEntry(transaction: TransactionEntity) {
+        TODO("Not yet implemented")
     }
 
     override fun signOut() {

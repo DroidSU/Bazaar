@@ -8,10 +8,6 @@ import com.sujoy.data.repository.DatabaseRepository
 import com.sujoy.data.repository.DatabaseRepositoryImpl
 import com.sujoy.data.repository.NetworkRepository
 import com.sujoy.data.repository.NetworkRepositoryImpl
-import com.sujoy.data.repository.ProductRepository
-import com.sujoy.data.repository.ProductRepositoryImpl
-import com.sujoy.data.repository.TransactionsRepository
-import com.sujoy.data.repository.TransactionsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -35,18 +31,6 @@ abstract class DIModule {
     abstract fun bindDatabaseRepository(
         databaseRepositoryImpl: DatabaseRepositoryImpl
     ): DatabaseRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindProductRepository(
-        productRepositoryImpl: ProductRepositoryImpl
-    ): ProductRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindTransactionsRepository(
-        transactionsRepositoryImpl: TransactionsRepositoryImpl
-    ): TransactionsRepository
 
     companion object {
         @Provides

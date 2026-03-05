@@ -7,5 +7,8 @@ object ConstantsManager {
     const val TABLE_TRANSACTIONS = "transactions"
     const val TABLE_USER = "user"
 
+    const val COLLECTION_PRODUCTS = "products"
+    const val COLLECTION_TRANSACTIONS = "transactions"
+
     const val RESEND_TIMEOUT = 60
 }
