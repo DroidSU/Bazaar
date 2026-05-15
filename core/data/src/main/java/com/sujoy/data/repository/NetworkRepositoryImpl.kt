@@ -88,7 +88,8 @@ class NetworkRepositoryImpl @Inject constructor(
     }
 
     override fun getProducts(): Flow<List<Product>> = callbackFlow {
-        val listenerRegistration = db.collection("products").document(auth.currentUser!!.uid)
+        val userId = auth.currentUser?.uid ?: return@callbackFlow
+        val listenerRegistration = db.collection(ConstantsManager.COLLECTION_PRODUCTS).document(userId)
             .collection("userProducts")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -200,15 +201,47 @@ class NetworkRepositoryImpl @Inject constructor(
     }
 
     override suspend fun storeProductList(products: List<Product>) {
-        TODO("Not yet implemented")
+        val userId = auth.currentUser?.uid ?: return
+        try {
+            val batch = db.batch()
+            val collectionRef = db.collection(ConstantsManager.COLLECTION_PRODUCTS).document(userId)
+                .collection("userProducts")
+            for (product in products) {
+                val docRef = collectionRef.document(product.id)
+                batch.set(docRef, product)
+            }
+            batch.commit().await()
+        } catch (e: Exception) {
+            Log.e(ConstantsManager.APP_TAG, "Error storing product list", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+            throw e
+        }
     }
 
     override suspend fun updateProduct(product: Product) {
-        TODO("Not yet implemented")
+        val userId = auth.currentUser?.uid ?: return
+        try {
+            db.collection(ConstantsManager.COLLECTION_PRODUCTS).document(userId)
+                .collection("userProducts").document(product.id)
+                .set(product).await()
+        } catch (e: Exception) {
+            Log.e(ConstantsManager.APP_TAG, "Error updating product", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+            throw e
+        }
     }
 
     override suspend fun createTransactionsEntry(transaction: TransactionEntity) {
-        TODO("Not yet implemented")
+        val userId = auth.currentUser?.uid ?: return
+        try {
+            db.collection(ConstantsManager.COLLECTION_TRANSACTIONS).document(userId)
+                .collection("userTransactions").document(transaction.transactionsId.toString())
+                .set(transaction).await()
+        } catch (e: Exception) {
+            Log.e(ConstantsManager.APP_TAG, "Error creating transaction", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+            throw e
+        }
     }
 
     override fun signOut() {

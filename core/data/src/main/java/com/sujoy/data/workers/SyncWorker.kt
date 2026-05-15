@@ -1,10 +1,11 @@
 package com.sujoy.data.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
-import com.google.firebase.firestore.FirebaseFirestore
 import com.sujoy.common.ConstantsManager
 import com.sujoy.data.database.dao.ProductsDAO
 import com.sujoy.data.database.dao.TransactionsDAO
@@ -12,7 +13,6 @@ import com.sujoy.data.models.SyncState
 import com.sujoy.data.repository.NetworkRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.tasks.await
 
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -20,44 +20,33 @@ class SyncWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val productDAO: ProductsDAO,
     private val transactionDAO: TransactionsDAO,
-    private val firestore: FirebaseFirestore,
     private val networkRepository: NetworkRepository,
 ) : CoroutineWorker(context, workerParams) {
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): ListenableWorker.Result {
         return try {
             val pendingProducts = productDAO.getProductsBySyncState(SyncState.PENDING)
             val pendingTransactions = transactionDAO.getTransactionsBySyncState(SyncState.PENDING)
 
             // Sync Products
             for (product in pendingProducts) {
-                firestore.collection(ConstantsManager.COLLECTION_PRODUCTS)
-                    .document(product.id)
-                    .set(product)
-                    .await()
-
                 networkRepository.updateProduct(product)
-
                 productDAO.updateProduct(product.copy(syncState = SyncState.SYNCED))
             }
 
             // Sync Transactions
             for (transaction in pendingTransactions) {
-                firestore.collection(ConstantsManager.COLLECTION_TRANSACTIONS)
-                    .document(transaction.transactionsId.toString())
-                    .set(transaction)
-                    .await()
-
+                networkRepository.createTransactionsEntry(transaction)
                 transactionDAO.updateSyncState(transaction.transactionsId, SyncState.SYNCED)
-
             }
 
-            Result.success()
+            ListenableWorker.Result.success()
         } catch (e: Exception) {
+            Log.e(ConstantsManager.APP_TAG, "Sync error", e)
             if (runAttemptCount < 3) {
-                Result.retry()
+                ListenableWorker.Result.retry()
             } else {
-                Result.failure()
+                ListenableWorker.Result.failure()
             }
         }
     }

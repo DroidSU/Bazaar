@@ -47,5 +47,6 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.work.compiler)
 
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.google.code.gson)
 }
